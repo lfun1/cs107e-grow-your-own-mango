@@ -30,7 +30,7 @@ void config_spi_clock(void) {
 	// 7:4 empty and create space to write 3:0
 	val <<= 8;
 	// Put FACTOR_M.
-	val |= M.
+	val |= M;
 
 	// Jus be sure clear out everything in SPI0_CLK_REG.
 	*SPI0_CLK_REG &= 0;
@@ -43,18 +43,18 @@ void de_assert_spi_reset(void) {
 	// Make sure everything is zero.
 	*SPI_BGR_REG &= 0;
 	// SPI0_RST at bit 16
-	*SPI_BGR_REG | val << 16;
+	*SPI_BGR_REG = *SPI_BGR_REG | val << 16;
 }
 
 void config_spi_PINS(void) {
 	// Config SPI0-CLK, GPIO_PC2
-	gpio_set_function(GPIO_PC2, PC2_FUNC)
+	gpio_set_function(GPIO_PC2, PC2_FUNC);
 	// Config SPI0-CS0, GPIO_PC3
-	gpio_set_function(GPIO_PC3, PC3_FUNC)
+	gpio_set_function(GPIO_PC3, PC3_FUNC);
 	// Config SPI0-MOSI, GPIO_PC4
-	gpio_set_function(GPIO_PC4, PC4_FUNC)
+	gpio_set_function(GPIO_PC4, PC4_FUNC);
 	// Config SPI0-MISO, GPIO_PC5
-	gpio_set_function(GPIO_PC5, PC5_FUNC)
+	gpio_set_function(GPIO_PC5, PC5_FUNC);
 }
 
 void config_spi_sample_mode(void) {
@@ -92,24 +92,23 @@ void start_transmit(void) {
 	*SPI_TCR_REG |= 0x80000000; // Start transmit.
 }
 
-main(void) {
-	// Enable SPI clock
-	config_spi_clock();
-	// De-assert SPI Reset
-	de_assert_spi_reset();
-	// Configure SPI PIN
-	config_spi_PINS();
-	// Configure SPI Sample mode
-	config_spi_sample_mode();
-	// Configure SPI mode
-	config_sample_mode();
-	// Enable SPI control: Already set default 0.
-	// Configure SPI_TX number and dummy counter
-	config_dummy_counter();
-	// Config SPI_TX length and total number of transfers
-	config_total_trans_len();
-	// Start Transmit
-
-
-}
+// void main(void) {
+// 	// Enable SPI clock
+// 	config_spi_clock();
+// 	// De-assert SPI Reset
+// 	de_assert_spi_reset();
+// 	// Configure SPI PIN
+// 	config_spi_PINS();
+// 	// Configure SPI Sample mode
+// 	config_spi_sample_mode();
+// 	// Configure SPI mode
+// 	config_sample_mode();
+// 	// Enable SPI control: Already set default 0.
+// 	// Configure SPI_TX number and dummy counter
+// 	config_dummy_counter();
+// 	// Config SPI_TX length and total number of transfers
+// 	config_total_trans_len();
+// 	// Start Transmit
+// 	start_transmit();
+// }
 
