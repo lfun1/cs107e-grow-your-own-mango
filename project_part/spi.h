@@ -9,6 +9,7 @@
 #define SPI_MTC_OFFSET 0x0034
 #define SPI_MBC_OFFSET 0x0030
 #define SPI_TXD_OFFSET 0x0200
+#define SPI_RXD_OFFSET 0x0300
 
 void config_spi_clock(void);
 

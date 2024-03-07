@@ -90,7 +90,6 @@ void config_total_trans_len(void) {
 }
 
 void start_transmit(void) {
-	printf("We're in spi.c");
 	*SPI_TCR_REG &= 0x7FFFFFFF;
 	*SPI_TCR_REG |= 0x80000000; // Start transmit.
 }

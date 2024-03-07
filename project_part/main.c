@@ -5,6 +5,10 @@
 #include "printf.h"
 #include "uart.h"
 #include "spi.h"
+#include "timer.h"
+
+static *SPI_TXD_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_TXD_OFFSET);
+static *SPI_RXD_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_RXD_OFFSET);
 
 void main(void) {
     uart_init();
@@ -33,14 +37,16 @@ void main(void) {
      // So the channel i can have a second byte of 0b1000 0000
      // Third byte, "Dont care bits" 0b0000 0000
 
-     // 
-
-     // Chanel zero = 0b1000 000 = 0x80
-     
-
+     // Trying to combine everything. write 0000 0001 | 1000 0000 | 0000 0000
+     *SPI_TXD_REG = 0x0180000;
 
      // Start Transmit
      start_transmit();
 
+     // Try to delay it after starting.
+     timer_delay_ms(250);
 
+     // Trying the value from the receiver.
+     unsigned int val_received = *SPI_RXD_REG;
+     printf("This is the data read: %d\n", val_received);
 }
