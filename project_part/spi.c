@@ -1,8 +1,9 @@
 #include "gpio.h"
 #include "spi.h"
+#include "printf.h"
 
 #define M 1
-#define N 0b10 // FACTOR_N 4
+#define N 4
 #define PC2_FUNC 0b0010
 #define PC3_FUNC 0b0010
 #define PC4_FUNC 0b0010
@@ -85,12 +86,16 @@ void config_total_trans_len(void) {
 	unsigned int val = 3;
 	*SPI_MTC_REG |= val;
 	*SPI_MBC_REG |= val;
+
 }
 
 void start_transmit(void) {
+	printf("We're in spi.c");
 	*SPI_TCR_REG &= 0x7FFFFFFF;
 	*SPI_TCR_REG |= 0x80000000; // Start transmit.
 }
+
+
 
 // void main(void) {
 // 	// Enable SPI clock
