@@ -39,7 +39,8 @@ void main(void) {
 
      // Trying to combine everything. write 0000 0001 | 1000 0000 | 0000 0000
      *SPI_TXD_REG = 0x0180000;
-
+     *SPI_RXD_REG = 1024;
+     printf("Value before transimit: %d\n", *SPI_RXD_REG);
      // Start Transmit
      start_transmit();
 
@@ -47,6 +48,5 @@ void main(void) {
      timer_delay_ms(250);
 
      // Trying the value from the receiver.
-     unsigned int val_received = *SPI_RXD_REG;
-     printf("This is the data read: %d\n", val_received);
+     printf("This is the data read: %d\n", *SPI_RXD_REG);
 }
