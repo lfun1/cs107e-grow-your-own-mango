@@ -2,7 +2,7 @@
 #include "spi.h"
 
 #define M 1
-#define N 4
+#define N 0b10 // FACTOR_N 4
 #define PC2_FUNC 0b0010
 #define PC3_FUNC 0b0010
 #define PC4_FUNC 0b0010
