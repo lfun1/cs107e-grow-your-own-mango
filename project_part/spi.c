@@ -2,14 +2,14 @@
 #include "spi.h"
 #include "printf.h"
 
-#define M 5
-#define N 2
+#define M 0b1000
+#define N 0b01
 #define PC2_FUNC 0b0010
 #define PC3_FUNC 0b0010
 #define PC4_FUNC 0b0010
 #define PC5_FUNC 0b0010
 
-static unsigned int *SPI0_CLK_REG = (unsigned int *)(CLOCK_CONTROLLER_UNIT_BASE_ADDRSS + SPI0_CLK_REG_OFFSET);
+static unsigned int *SPI0_CLK_REG = (unsigned int *)(CLOCK_CONTROLLER_UNIT_BASE_ADDRSS + SPI1_CLK_REG_OFFSET);
 static unsigned int *SPI_BGR_REG = (unsigned int *)(CLOCK_CONTROLLER_UNIT_BASE_ADDRSS + SPI_BGR_REG_OFFSET);
 static unsigned int *SPI_TCR_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_TCR_OFFSET);
 static unsigned int *SPI_BCC_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_BCC_OFFSET);
@@ -20,23 +20,39 @@ static unsigned int *SPI_MBC_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_MBC_
 void config_spi_clock(void) {
 	// 31 Get the SPI0_CLK_GATING first
 	unsigned int val = 1;
-	// 30:27 empty and create space to write 26:24
-	val <<= 7;
-	// 26:24 Choose CLK_SRC_SEL. In this case **001: PLL_PERI(1X)** change to 000: HOSC
-	val |= 0b000;
-	// 23:10 empty and create space to write 9:8
-	val <<= 16;
-	// Put FACTOR_N.
-	val |= N;
-	// 7:4 empty and create space to write 3:0
-	val <<= 8;
-	// Put FACTOR_M.
-	val |= M;
+	// Configure clock source
+	*SPI0_CLK_REG &= ~(0b111 << 24);
+	*SPI0_CLK_REG |= (0b001 << 24);
 
-	// Jus be sure clear out everything in SPI0_CLK_REG.
-	*SPI0_CLK_REG &= 0;
-	// Write val to config the value.
-	*SPI0_CLK_REG |= val;
+	// Set division factors
+	*SPI0_CLK_REG &= ~(0b11 << 8); // N
+	*SPI0_CLK_REG |= (N << 8);
+
+	*SPI0_CLK_REG &= ~(0b1111); // M
+	*SPI0_CLK_REG |= M;
+
+	// Turn on clock
+	*SPI0_CLK_REG &= ~ (1 << 31);
+	*SPI0_CLK_REG |= (1 << 31);
+
+	// // 30:27 empty and create space to write 26:24
+	// val <<= 7;
+	// // 26:24 Choose CLK_SRC_SEL. In this case **001: PLL_PERI(1X)** change to 000: HOSC
+	// val |= 0b001;
+	// // 23:10 empty and create space to write 9:8
+	// val <<= 16;
+	// // Put FACTOR_N.
+	// val |= N;
+	// // 7:4 empty and create space to write 3:0
+	// val <<= 8;
+	// // Put FACTOR_M.
+	// val |= M;
+
+	// // Jus be sure clear out everything in SPI0_CLK_REG.
+	// *SPI0_CLK_REG &= 0;
+	// // Write val to config the value.
+	// *SPI0_CLK_REG |= val;
+
 	printf("Clock value at address %p is: %x\n", (void *)SPI0_CLK_REG, *SPI0_CLK_REG);
 }
 
@@ -50,13 +66,13 @@ void de_assert_spi_reset(void) {
 
 void config_spi_PINS(void) {
 	// Config SPI0-CLK, GPIO_PC2
-	gpio_set_function(GPIO_PC2, PC2_FUNC);
+	gpio_set_function(GPIO_PD11, GPIO_FN_ALT4);
 	// Config SPI0-CS0, GPIO_PC3
-	gpio_set_function(GPIO_PC3, PC3_FUNC);
+	gpio_set_function(GPIO_PD10, GPIO_FN_ALT4);
 	// Config SPI0-MOSI, GPIO_PC4
-	gpio_set_function(GPIO_PC4, PC4_FUNC);
+	gpio_set_function(GPIO_PD12, GPIO_FN_ALT4);
 	// Config SPI0-MISO, GPIO_PC5
-	gpio_set_function(GPIO_PC5, PC5_FUNC);
+	gpio_set_function(GPIO_PD13, GPIO_FN_ALT4);
 }
 
 void config_spi_sample_mode(void) {

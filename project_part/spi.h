@@ -4,6 +4,7 @@
 #define SPI_BGR_REG_OFFSET 0x096C // SPI Bus Gating Reset Register
 
 #define SPI0_BASE_ADDRESS 0x04025000
+#define SPI1_BASE_ADDRESS 0x04026000
 #define SPI_TCR_OFFSET 0x0008    // SPI Transfer Control Register
 #define SPI_BCC_OFFSET 0x0038
 #define SPI_MTC_OFFSET 0x0034
