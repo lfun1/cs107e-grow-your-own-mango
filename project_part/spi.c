@@ -2,8 +2,8 @@
 #include "spi.h"
 #include "printf.h"
 
-#define M 1
-#define N 4
+#define M 5
+#define N 2
 #define PC2_FUNC 0b0010
 #define PC3_FUNC 0b0010
 #define PC4_FUNC 0b0010
@@ -22,8 +22,8 @@ void config_spi_clock(void) {
 	unsigned int val = 1;
 	// 30:27 empty and create space to write 26:24
 	val <<= 7;
-	// 26:24 Choose CLK_SRC_SEL. In this case 001: PLL_PERI(1X)
-	val |= 0b001;
+	// 26:24 Choose CLK_SRC_SEL. In this case **001: PLL_PERI(1X)** change to 000: HOSC
+	val |= 0b000;
 	// 23:10 empty and create space to write 9:8
 	val <<= 16;
 	// Put FACTOR_N.
@@ -37,6 +37,7 @@ void config_spi_clock(void) {
 	*SPI0_CLK_REG &= 0;
 	// Write val to config the value.
 	*SPI0_CLK_REG |= val;
+	printf("Clock value at address %p is: %x\n", (void *)SPI0_CLK_REG, *SPI0_CLK_REG);
 }
 
 void de_assert_spi_reset(void) {
@@ -92,6 +93,7 @@ void config_total_trans_len(void) {
 void start_transmit(void) {
 	*SPI_TCR_REG &= 0x7FFFFFFF;
 	*SPI_TCR_REG |= 0x80000000; // Start transmit.
+	printf("Clock value at address %p is: %x\n", (void *)SPI0_CLK_REG, *SPI0_CLK_REG);
 }
 
 
