@@ -19,7 +19,8 @@ static unsigned int *SPI_MBC_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_MBC_
 
 void config_spi_clock(void) {
 	// 31 Get the SPI0_CLK_GATING first
-	unsigned int val = 1;
+	// unsigned int val = 1;
+    
 	// Configure clock source
 	*SPI0_CLK_REG &= ~(0b111 << 24);
 	*SPI0_CLK_REG |= (0b001 << 24);
@@ -53,15 +54,21 @@ void config_spi_clock(void) {
 	// // Write val to config the value.
 	// *SPI0_CLK_REG |= val;
 
-	printf("Clock value at address %p is: %x\n", (void *)SPI0_CLK_REG, *SPI0_CLK_REG);
+	//printf("Clock value at address %p is: %x\n", (void *)SPI0_CLK_REG, *SPI0_CLK_REG);
 }
 
 void de_assert_spi_reset(void) {
-	unsigned int val = 1;
+	// unsigned int val = 1;
 	// Make sure everything is zero.
-	*SPI_BGR_REG &= 0;
-	// SPI0_RST at bit 16
-	*SPI_BGR_REG = *SPI_BGR_REG | val << 16;
+	// *SPI_BGR_REG &= 0;
+	// SPI1_RST at bit 17
+	// *SPI_BGR_REG = *SPI_BGR_REG | val << 17;
+
+    // *SPI_BGR_REG |= 0b10; // For pass, but want mask
+
+    // SPI1_RST at bit 17
+    *SPI_BGR_REG &= ~(1 << 17);
+    *SPI_BGR_REG |= (1 << 17);
 }
 
 void config_spi_PINS(void) {
@@ -78,17 +85,24 @@ void config_spi_PINS(void) {
 void config_spi_sample_mode(void) {
 	// SPI_TCR[11][13] Set it Delay since the clock has high speed.
 	// Set Master Sample Data Control to delay to reduce error and leave SDM on delay
-	unsigned int val = 1;
-	val <<= 11;
-	*SPI_TCR_REG = 0xFFFFF7FF;
-	*SPI_TCR_REG |= val;
+	/* unsigned int val = 1; */
+	/* val <<= 11; */
+	/* *SPI_TCR_REG = 0xFFFFF7FF; */
+	/* *SPI_TCR_REG |= val; */
+
+    // Turn on [11] = 0, [13] = 1
+    *SPI_BGR_REG &= ~(1 << 11);
+    *SPI_BGR_REG |= (1 << 13);
 }
 
 void config_sample_mode(void) {
 	// SPI_TCR[0][1] Choose Mode 1 [1] = 0, [0] = 1;
-	unsigned int val = 1;
-	*SPI_TCR_REG = 0xFFFFFFFC;
-	*SPI_TCR_REG |= val;
+	/* unsigned int val = 1; */
+	/* *SPI_TCR_REG = 0xFFFFFFFC; */
+	/* *SPI_TCR_REG |= val; */
+
+    *SPI_TCR_REG &= ~0b11;
+    *SPI_TCR_REG |= 0b01;
 }
 
 void config_dummy_counter(void) {

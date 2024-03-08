@@ -7,8 +7,8 @@
 #include "spi.h"
 #include "timer.h"
 
-static *SPI_TXD_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_TXD_OFFSET);
-static *SPI_RXD_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_RXD_OFFSET);
+static unsigned int *SPI_TXD_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_TXD_OFFSET);
+static unsigned int *SPI_RXD_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_RXD_OFFSET);
 
 void main(void) {
     uart_init();
