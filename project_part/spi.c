@@ -9,7 +9,7 @@
 #define PC4_FUNC 0b0010
 #define PC5_FUNC 0b0010
 
-static unsigned int *SPI0_CLK_REG = (unsigned int *)(CLOCK_CONTROLLER_UNIT_BASE_ADDRSS + SPI1_CLK_REG_OFFSET);
+static unsigned int *SPI1_CLK_REG = (unsigned int *)(CLOCK_CONTROLLER_UNIT_BASE_ADDRSS + SPI1_CLK_REG_OFFSET);
 static unsigned int *SPI_BGR_REG = (unsigned int *)(CLOCK_CONTROLLER_UNIT_BASE_ADDRSS + SPI_BGR_REG_OFFSET);
 static unsigned int *SPI_TCR_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_TCR_OFFSET);
 static unsigned int *SPI_BCC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_BCC_OFFSET);
@@ -17,27 +17,28 @@ static unsigned int *SPI_MTC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MTC_
 static unsigned int *SPI_MBC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MBC_OFFSET);
 
 void enable_spi_clock(void) {
-    
+    // Turn on SCLK_GATING
+    // Turn on clock
+	*SPI0_CLK_REG &= ~ (1 << 31);
+	*SPI0_CLK_REG |= (1 << 31);
 }
 
 void config_spi_clock(void) {
 	// 31 Get the SPI0_CLK_GATING first
 	// unsigned int val = 1;
     
-	// Configure clock source
+	// Clock source select
 	*SPI0_CLK_REG &= ~(0b111 << 24);
-	*SPI0_CLK_REG |= (0b001 << 24);
+    const unsigned int HOSC = 0b000;
+	*SPI0_CLK_REG |= (HOSC << 24);
 
-	// Set division factors
-	*SPI0_CLK_REG &= ~(0b11 << 8); // N
-	*SPI0_CLK_REG |= (N << 8);
+    // DO NOT TAMPER WITH PLL
+	// Set division factors (for PLL)
+	//*SPI0_CLK_REG &= ~(0b11 << 8); // N
+	//*SPI0_CLK_REG |= (N << 8);
 
-	*SPI0_CLK_REG &= ~(0b1111); // M
-	*SPI0_CLK_REG |= M;
-
-	// Turn on clock
-	*SPI0_CLK_REG &= ~ (1 << 31);
-	*SPI0_CLK_REG |= (1 << 31);
+	//*SPI0_CLK_REG &= ~(0b1111); // M
+	//*SPI0_CLK_REG |= M;
 
 	// // 30:27 empty and create space to write 26:24
 	// val <<= 7;
