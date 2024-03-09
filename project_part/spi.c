@@ -46,14 +46,17 @@ void de_assert_spi_reset(void) {
 }
 
 void config_spi_PINS(void) {
+    // SPI0
 	// Config SPI0-CLK, GPIO_PC2
-	gpio_set_function(GPIO_PD11, GPIO_FN_ALT4);
-	// Config SPI0-CS0, GPIO_PC3
-	gpio_set_function(GPIO_PD10, GPIO_FN_ALT4);
+    // Config SPI0-CS0, GPIO_PC3
 	// Config SPI0-MOSI, GPIO_PC4
-	gpio_set_function(GPIO_PD12, GPIO_FN_ALT4);
 	// Config SPI0-MISO, GPIO_PC5
-	gpio_set_function(GPIO_PD13, GPIO_FN_ALT4);
+
+    // SPI1 configure pins
+	gpio_set_function(GPIO_PD11, GPIO_FN_ALT4); // SPI1-CLK
+	gpio_set_function(GPIO_PD10, GPIO_FN_ALT4); // SPI1-CS
+	gpio_set_function(GPIO_PD12, GPIO_FN_ALT4); // SPI1-MOSI
+	gpio_set_function(GPIO_PD13, GPIO_FN_ALT4); // SPI1-MISO
 }
 
 void config_spi_sample_mode(void) {
@@ -64,7 +67,7 @@ void config_spi_sample_mode(void) {
 	/* *SPI_TCR_REG = 0xFFFFF7FF; */
 	/* *SPI_TCR_REG |= val; */
 
-    // Turn on [11] = 0, [13] = 1
+    // Turn on [11] = 0 (Normal operation), [13] = 1 (Normal sample mode)
     *SPI_BGR_REG &= ~(1 << 11);
     *SPI_BGR_REG |= (1 << 13);
 }
