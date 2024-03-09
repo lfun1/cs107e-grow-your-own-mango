@@ -17,62 +17,32 @@ static unsigned int *SPI_MTC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MTC_
 static unsigned int *SPI_MBC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MBC_OFFSET);
 
 void enable_spi_clock(void) {
-    // Turn on SCLK_GATING
-    // Turn on clock
-	*SPI0_CLK_REG &= ~ (1 << 31);
-	*SPI0_CLK_REG |= (1 << 31);
+    // Turn on clock in SPI1_SCLK_GATING
+    // Write 1: Clock is ON to SPI1_CLK_REG[31]
+	*SPI1_CLK_REG &= ~(1 << 31);
+	*SPI1_CLK_REG |= (1 << 31);
 }
 
 void config_spi_clock(void) {
-	// 31 Get the SPI0_CLK_GATING first
-	// unsigned int val = 1;
-    
 	// Clock source select
-	*SPI0_CLK_REG &= ~(0b111 << 24);
+    // Write 000: HOSC to SPI1_CLK_REG[26:24]
+	*SPI1_CLK_REG &= ~(0b111 << 24);
     const unsigned int HOSC = 0b000;
-	*SPI0_CLK_REG |= (HOSC << 24);
+	*SPI1_CLK_REG |= (HOSC << 24);
 
-    // DO NOT TAMPER WITH PLL
-	// Set division factors (for PLL)
-	//*SPI0_CLK_REG &= ~(0b11 << 8); // N
-	//*SPI0_CLK_REG |= (N << 8);
+    // DO NOT TAMPER WITH PLL clock
 
-	//*SPI0_CLK_REG &= ~(0b1111); // M
-	//*SPI0_CLK_REG |= M;
-
-	// // 30:27 empty and create space to write 26:24
-	// val <<= 7;
-	// // 26:24 Choose CLK_SRC_SEL. In this case **001: PLL_PERI(1X)** change to 000: HOSC
-	// val |= 0b001;
-	// // 23:10 empty and create space to write 9:8
-	// val <<= 16;
-	// // Put FACTOR_N.
-	// val |= N;
-	// // 7:4 empty and create space to write 3:0
-	// val <<= 8;
-	// // Put FACTOR_M.
-	// val |= M;
-
-	// // Jus be sure clear out everything in SPI0_CLK_REG.
-	// *SPI0_CLK_REG &= 0;
-	// // Write val to config the value.
-	// *SPI0_CLK_REG |= val;
-
-	//printf("Clock value at address %p is: %x\n", (void *)SPI0_CLK_REG, *SPI0_CLK_REG);
+	//printf("Clock value at address %p is: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
 }
 
 void de_assert_spi_reset(void) {
-	// unsigned int val = 1;
-	// Make sure everything is zero.
-	// *SPI_BGR_REG &= 0;
-	// SPI1_RST at bit 17
-	// *SPI_BGR_REG = *SPI_BGR_REG | val << 17;
-
-    // *SPI_BGR_REG |= 0b10; // For pass, but want mask
-
-    // SPI1_RST at bit 17
+    // SPI1_RST at bit 17, write 1: De-assert
     *SPI_BGR_REG &= ~(1 << 17);
     *SPI_BGR_REG |= (1 << 17);
+
+    // Gating Clock for SPI1 at bit 1, write 1: Pass
+    *SPI_BGR_REG &= ~(1 << 1);
+    *SPI_BGR_REG |= (1 << 1);
 }
 
 void config_spi_PINS(void) {
@@ -127,7 +97,7 @@ void config_total_trans_len(void) {
 void start_transmit(void) {
 	*SPI_TCR_REG &= 0x7FFFFFFF;
 	*SPI_TCR_REG |= 0x80000000; // Start transmit.
-	printf("Clock value at address %p is: %x\n", (void *)SPI0_CLK_REG, *SPI0_CLK_REG);
+	printf("Clock value at address %p is: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
 }
 
 
