@@ -39,7 +39,8 @@ void main(void) {
     config_total_trans_len();
 
     printf("Register values after SPI config\n");
-
+    print_spi_registers();
+    
     // THE BYTES TO BE SENT
 
     // First byte, includes start bit 1, 0b0000 0001

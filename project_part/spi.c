@@ -68,18 +68,17 @@ void config_spi_sample_mode(void) {
 	/* *SPI_TCR_REG |= val; */
 
     // Turn on [11] = 0 (Normal operation), [13] = 1 (Normal sample mode)
-    *SPI_BGR_REG &= ~(1 << 11);
-    *SPI_BGR_REG |= (1 << 13);
+    *SPI_TCR_REG &= ~(1 << 11);
+    *SPI_TCR_REG |= (1 << 13);
 }
 
 void config_sample_mode(void) {
-	// SPI_TCR[0][1] Choose Mode 1 [1] = 0, [0] = 1;
-	/* unsigned int val = 1; */
-	/* *SPI_TCR_REG = 0xFFFFFFFC; */
-	/* *SPI_TCR_REG |= val; */
+	// SPI_TCR[0][1] Choose Mode 0 [1] = 0, [0] = 0;
+    // MCP3008 only supports Mode0, Mode3
 
+    // Set to Mode0
     *SPI_TCR_REG &= ~0b11;
-    *SPI_TCR_REG |= 0b01;
+    *SPI_TCR_REG |= 0b00; // CPOL[1] = 0, CPHA[0] = 0;
 }
 
 void config_dummy_counter(void) {
