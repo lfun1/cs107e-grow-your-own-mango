@@ -12,6 +12,8 @@
 #define SPI_TXD_OFFSET 0x0200    // SPI TX Data register
 #define SPI_RXD_OFFSET 0x0300    // SPI RX Data register
 
+void enable_spi_clock(void);
+
 void config_spi_clock(void);
 
 void de_assert_spi_reset(void);

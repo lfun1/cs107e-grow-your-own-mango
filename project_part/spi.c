@@ -11,11 +11,14 @@
 
 static unsigned int *SPI0_CLK_REG = (unsigned int *)(CLOCK_CONTROLLER_UNIT_BASE_ADDRSS + SPI1_CLK_REG_OFFSET);
 static unsigned int *SPI_BGR_REG = (unsigned int *)(CLOCK_CONTROLLER_UNIT_BASE_ADDRSS + SPI_BGR_REG_OFFSET);
-static unsigned int *SPI_TCR_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_TCR_OFFSET);
-static unsigned int *SPI_BCC_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_BCC_OFFSET);
-static unsigned int *SPI_MTC_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_MTC_OFFSET);
-static unsigned int *SPI_MBC_REG = (unsigned int *)(SPI0_BASE_ADDRESS + SPI_MBC_OFFSET);
+static unsigned int *SPI_TCR_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_TCR_OFFSET);
+static unsigned int *SPI_BCC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_BCC_OFFSET);
+static unsigned int *SPI_MTC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MTC_OFFSET);
+static unsigned int *SPI_MBC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MBC_OFFSET);
 
+void enable_spi_clock(void) {
+    
+}
 
 void config_spi_clock(void) {
 	// 31 Get the SPI0_CLK_GATING first
