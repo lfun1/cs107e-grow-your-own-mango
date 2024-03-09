@@ -29,6 +29,20 @@ static void show_on_off(void) {
     }
 }
 
+static void read_soil_moisture(void) {
+    // Soil Moisture Sensor AOUT on MCP3008 Channel 0
+    
+    // values read when completely dry and completely in water
+    static const int DRY = 860, WATER = 400;
+    
+    while (1) {
+        int moisture = mcp3008_read(0);
+        printf("Soil Moisture value read: %4d\n", moisture);
+        printf("Moisture: %2d%%\n", 100 * (DRY - moisture) / (DRY - WATER));
+        timer_delay_ms(250);
+    }
+}
+
 void main(void)  {
     gpio_init();
     uart_init();
@@ -36,5 +50,6 @@ void main(void)  {
 
     //show_pots();
     //show_joystick();
-    show_on_off();
+    //show_on_off();
+    read_soil_moisture();
 }
