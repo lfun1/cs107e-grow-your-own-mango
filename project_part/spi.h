@@ -6,11 +6,11 @@
 #define SPI0_BASE_ADDRESS 0x04025000
 #define SPI1_BASE_ADDRESS 0x04026000
 #define SPI_TCR_OFFSET 0x0008    // SPI Transfer Control Register
-#define SPI_BCC_OFFSET 0x0038
-#define SPI_MTC_OFFSET 0x0034
-#define SPI_MBC_OFFSET 0x0030
-#define SPI_TXD_OFFSET 0x0200
-#define SPI_RXD_OFFSET 0x0300
+#define SPI_BCC_OFFSET 0x0038    // SPI Master Burst Control Register
+#define SPI_MTC_OFFSET 0x0034    // SPI Master Transmit Counter Register
+#define SPI_MBC_OFFSET 0x0030    // SPI Master Burst Counter Register
+#define SPI_TXD_OFFSET 0x0200    // SPI TX Data register
+#define SPI_RXD_OFFSET 0x0300    // SPI RX Data register
 
 void config_spi_clock(void);
 
