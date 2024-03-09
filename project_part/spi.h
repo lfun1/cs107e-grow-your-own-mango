@@ -11,6 +11,7 @@
 #define SPI_MBC_OFFSET 0x0030    // SPI Master Burst Counter Register
 #define SPI_TXD_OFFSET 0x0200    // SPI TX Data register
 #define SPI_RXD_OFFSET 0x0300    // SPI RX Data register
+#define SPI_GCR_OFFSET 0x0004
 
 void enable_spi_clock(void);
 

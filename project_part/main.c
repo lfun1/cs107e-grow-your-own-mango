@@ -17,6 +17,8 @@ void main(void) {
 
     printf("Initial register values\n");
     print_spi_registers();
+
+    config_slave_mas();
     
     // Enable SPI clock
     enable_spi_clock();
@@ -37,6 +39,10 @@ void main(void) {
     config_dummy_counter();
     // Config SPI_TX length and total number of transfers
     config_total_trans_len();
+    // GCR
+    
+
+    // softaware_controller();
 
     printf("Register values after SPI config\n");
     print_spi_registers();
@@ -52,15 +58,14 @@ void main(void) {
         // Trying to combine everything. write 0000 0001 | 1000 0000 | 0000 0000
         // Check: MSB vs LSB, how to set TXFIFO
         *SPI_TXD_REG = 0x0180000;
-        *SPI_RXD_REG = 1024;
-        printf("Value before transimit: %d\n", *SPI_RXD_REG);
+        printf("Value before send: %x\n", *SPI_TXD_REG);
         // Start Transmit
         start_transmit();
 
         // Try to delay it after starting.
-        timer_delay_ms(250);
+        // timer_delay_ms(250);
 
         // Trying the value from the receiver.
-        printf("This is the data read: %d\n", *SPI_RXD_REG);
+        printf("Data after: %x\n", *SPI_TXD_REG);
     }
 }

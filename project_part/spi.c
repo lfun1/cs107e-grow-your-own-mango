@@ -15,6 +15,7 @@ static unsigned int *SPI_TCR_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_TCR_
 static unsigned int *SPI_BCC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_BCC_OFFSET);
 static unsigned int *SPI_MTC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MTC_OFFSET);
 static unsigned int *SPI_MBC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MBC_OFFSET);
+static unsigned int *SPI_GCR_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_GCR_OFFSET);
 
 void enable_spi_clock(void) {
     // Turn on clock in SPI1_SCLK_GATING
@@ -72,6 +73,11 @@ void config_spi_sample_mode(void) {
     *SPI_TCR_REG |= (1 << 13);
 }
 
+void softaware_controller(void) {
+	*SPI_TCR_REG &= ~(1 << 6);
+	*SPI_TCR_REG |= (1 << 6);
+}
+
 void config_sample_mode(void) {
 	// SPI_TCR[0][1] Choose Mode 0 [1] = 0, [0] = 0;
     // MCP3008 only supports Mode0, Mode3
@@ -83,24 +89,36 @@ void config_sample_mode(void) {
 
 void config_dummy_counter(void) {
 	// Default is zero.
-	unsigned int val = 3;
-	val <<= 24;
-	val |= 0b11;
-	*SPI_BCC_REG |= val;
+	// unsigned int val = 3;
+	// val <<= 24;
+	// val |= 0b11;
+	*SPI_BCC_REG |= 3;
 }
 
 void config_total_trans_len(void) {
 	unsigned int val = 3;
 	*SPI_MTC_REG |= val;
-	*SPI_MBC_REG |= val;
+	*SPI_MBC_REG |= val + val;
 
 }
 
+void config_slave_mas(void) {
+	*SPI_GCR_REG |= 0b11;
+}
+
 void start_transmit(void) {
+	// *SPI_TCR_REG &= ~(1 << 7);
 	*SPI_TCR_REG &= 0x7FFFFFFF;
 	*SPI_TCR_REG |= 0x80000000; // Start transmit.
 	// printf("Clock value at address %p is: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
 }
+
+void stop_transmit(void) {
+	*SPI_TCR_REG &= ~(1 << 31);
+	*SPI_TCR_REG |= (1 << 7);
+}
+
+
 
 
 
