@@ -32,7 +32,7 @@ void config_spi_clock(void) {
 
     // DO NOT TAMPER WITH PLL clock
 
-	//printf("Clock value at address %p is: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
+	printf("Clock value at address %p is: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
 }
 
 void de_assert_spi_reset(void) {
@@ -100,7 +100,7 @@ void config_total_trans_len(void) {
 void start_transmit(void) {
 	*SPI_TCR_REG &= 0x7FFFFFFF;
 	*SPI_TCR_REG |= 0x80000000; // Start transmit.
-	printf("Clock value at address %p is: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
+	// printf("Clock value at address %p is: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
 }
 
 
@@ -125,3 +125,12 @@ void start_transmit(void) {
 // 	start_transmit();
 // }
 
+void print_spi_registers(void) {
+    // Print contents of all SPI registers
+    printf("SPI1_CLK_REG address %p contains: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
+    printf("SPI_BGR_REG address %p contains: %x\n", (void *)SPI_BGR_REG, *SPI_BGR_REG);
+    printf("SPI_TCR_REG address %p contains: %x\n", (void *)SPI_TCR_REG, *SPI_TCR_REG);
+    printf("SPI_BCC_REG address %p contains: %x\n", (void *)SPI_BCC_REG, *SPI_BCC_REG);
+    printf("SPI_MTC_REG address %p contains: %x\n", (void *)SPI_MTC_REG, *SPI_MTC_REG);
+    printf("SPI_MBC_REG address %p contains: %x\n", (void *)SPI_MBC_REG, *SPI_MBC_REG);
+}

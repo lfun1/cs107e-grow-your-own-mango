@@ -29,3 +29,5 @@ void config_dummy_counter(void);
 void config_total_trans_len(void);
 
 void start_transmit(void);
+
+void print_spi_registers(void);

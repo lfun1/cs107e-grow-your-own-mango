@@ -14,6 +14,9 @@ void main(void) {
     uart_init();
     uart_putstring("Hello, world!\n");
     printf("I am printf, here m%c %s!\n", 'e', "ROAR");
+
+    printf("Initial register values\n");
+    print_spi_registers();
     
     // Enable SPI clock
     enable_spi_clock();
@@ -34,6 +37,8 @@ void main(void) {
     config_dummy_counter();
     // Config SPI_TX length and total number of transfers
     config_total_trans_len();
+
+    printf("Register values after SPI config\n");
 
     // THE BYTES TO BE SENT
 
