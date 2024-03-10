@@ -1,3 +1,19 @@
+enum {
+	BME280_REGISTER_CAL00 = 0x88, // calibration stored in 0x88 - 0xA1
+	BME280_REGISTER_CHIPID = 0xD0,
+	BME280_REGISTER_SOFTRESET = 0xE0,
+	BME280_REGISTER_CAL26 = 0xE1, // R calibration stored in 0xE1-0xF0
+
+
+	BME280_REGISTER_CONTROLHUMID = 0xF2,
+	BME280_REGISTER_STATUS = 0XF3,
+	BME280_REGISTER_CONTROL = 0xF4,
+	BME280_REGISTER_CONFIG = 0xF5,
+	BME280_REGISTER_PRESSUREDATA = 0xF7,
+	BME280_REGISTER_TEMPDATA = 0xFA,
+	BME280_REGISTER_HUMIDDATA = 0xFD,
+}
+
 struct bme280
 {
 	  enum sensor_sampling {
@@ -70,7 +86,7 @@ struct bme280
 	  void write8(byte reg, byte value);
 	  uint8_t read8(byte reg);
 	  uint16_t read16(byte reg);
-	  uint32_t read24(byte reg);
+	  // uint32_t read24(byte reg);
 	  int16_t readS16(byte reg);
 	  uint16_t read16_LE(byte reg); // little endian
 	  int16_t readS16_LE(byte reg); // little endian
