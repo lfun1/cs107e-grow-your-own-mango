@@ -73,9 +73,23 @@ void config_spi_sample_mode(void) {
     *SPI_TCR_REG |= (1 << 13);
 }
 
-void softaware_controller(void) {
+void software_controller(void) {
+    // Set SS_OWNER to 1 (software)
+    // Need to manually control SS signal in SS_LEVEL
 	*SPI_TCR_REG &= ~(1 << 6);
 	*SPI_TCR_REG |= (1 << 6);
+}
+
+void chip_select(void) {
+    // Manually control SS signal
+    // write 0 in SPI_TCR[7] sets SS to low (active)
+    *SPI_TCR_REG &= ~(1 << 7);
+}
+
+void chip_deselect(void) {
+    // Manually control SS signal
+    // write 1 in SPI_TCR[7] sets SS to high (not active)
+    *SPI_TCR_REG |= (1 << 7);
 }
 
 void config_clock_mode(void) {
@@ -88,17 +102,18 @@ void config_clock_mode(void) {
 }
 
 void config_dummy_counter(void) {
-	// Default is zero.
-	// unsigned int val = 3;
-	// val <<= 24;
-	// val |= 0b11;
-	*SPI_BCC_REG |= 3;
+    /* Set up STC in SPI_BCC_REG */
+    // STC = SPI_BCC_REG[23:0] = 3 bursts sent in single mode before dummy bursts
+    *SPI_BCC_REG |= 3;
+
+    // DBC is ignored (not using dual SPI mode)
+
 }
 
 void config_total_trans_len(void) {
 	unsigned int val = 3;
-	*SPI_MTC_REG |= val;
-	*SPI_MBC_REG |= val + val;
+	*SPI_MTC_REG |= val; // MWTC = burst number sent to TXFIFO before automatically sending dummy bursts
+	*SPI_MBC_REG |= val + val; // total bursts including TXD, RXD, dummy burst
 
 }
 
@@ -114,9 +129,12 @@ void spi_module_enable(void) {
 
 void start_transmit(void) {
 	// *SPI_TCR_REG &= ~(1 << 7);
-	*SPI_TCR_REG &= 0x7FFFFFFF;
-	*SPI_TCR_REG |= 0x80000000; // Start transmit.
+	// *SPI_TCR_REG &= 0x7FFFFFFF;
+	// *SPI_TCR_REG |= 0x80000000; // Start transmit.
 	// printf("Clock value at address %p is: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
+
+    // Turn on XCH, SPI_TCR[31]
+	*SPI_TCR_REG |= (1 << 31); // Start transmit.
 }
 
 void stop_transmit(void) {
@@ -145,6 +163,10 @@ void hexdump_spi(void) {
     }
 }
 
+void spi_fifo_status(void) {
+    unsigned int *fifo_status = (unsigned int *)(SPI1_BASE_ADDRESS + 0x1C);
+    printf("SPI FIFO STATUS at %p: %x\n", fifo_status, *fifo_status);
+}
 
 
 // void main(void) {

@@ -36,3 +36,11 @@ void config_master(void);
 void start_transmit(void);
 
 void print_spi_registers(void);
+
+void spi_fifo_status(void);
+
+void software_controller(void);
+
+void chip_select(void);
+
+void chip_deselect(void);

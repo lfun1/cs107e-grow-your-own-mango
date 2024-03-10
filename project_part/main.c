@@ -7,8 +7,9 @@
 #include "spi.h"
 #include "timer.h"
 
-static unsigned int *SPI_TXD_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_TXD_OFFSET);
-static unsigned int *SPI_RXD_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_RXD_OFFSET);
+// Changed to unsigned char * to write/read 1 byte at a time to FIFO
+static unsigned char *SPI_TXD_REG = (unsigned char *)(SPI1_BASE_ADDRESS + SPI_TXD_OFFSET);
+static unsigned char *SPI_RXD_REG = (unsigned char *)(SPI1_BASE_ADDRESS + SPI_RXD_OFFSET);
 
 static void spi_setup2(void) {
     /* Turn on SPI Peripheral */
@@ -36,6 +37,32 @@ static void spi_setup2(void) {
     spi_module_enable();
 }
 
+static void spi_tx_rx_test(void) {
+    // Configure SPI data bus mode
+    // SPI_BCC[28] is DRM, keep = 0 for RX single-bit mode
+
+    // Configure SPI_TX number and dummy counter
+    config_dummy_counter();
+    
+    // Config SPI_TX length and total number of transfers
+    config_total_trans_len();
+
+    // Put contents into TXFIFO
+    spi_fifo_status();
+    
+    *SPI_TXD_REG = 0x1;
+    *SPI_TXD_REG = 0x80;
+    *SPI_TXD_REG = 0x0;
+
+    spi_fifo_status();
+
+    // Start transmit
+    // Turn on XCH
+
+    start_transmit();
+}
+
+
 static void spi_setup1(void) {
 
     config_master();
@@ -62,7 +89,7 @@ static void spi_setup1(void) {
     // GCR
     
 
-    // softaware_controller();
+    // software_controller();
     
     // THE BYTES TO BE SENT
 
@@ -74,7 +101,8 @@ static void spi_setup1(void) {
     while(1) {
         // Trying to combine everything. write 0000 0001 | 1000 0000 | 0000 0000
         // Check: MSB vs LSB, how to set TXFIFO
-        *SPI_TXD_REG = 0x0180000;
+        //*SPI_TXD_REG = 0x0180000;
+        *SPI_TXD_REG = 0x01;
         printf("Value before send: %x\n", *SPI_TXD_REG);
         // Start Transmit
         start_transmit();
@@ -92,7 +120,7 @@ void main(void) {
     uart_putstring("Hello, world!\n");
     printf("I am printf, here m%c %s!\n", 'e', "ROAR");
 
-    printf("Initial register values\n");
+    printf("\nInitial register values\n");
     print_spi_registers();
     
     //spi_setup1();
@@ -101,8 +129,13 @@ void main(void) {
     // Confirmed default register values correct after SPI setup
     //hexdump_spi();
 
-    printf("Register values after SPI config\n");
+    printf("\nRegister values after SPI config\n");
     print_spi_registers();
 
+
     // Transmit data
+    spi_tx_rx_test();
+
+    printf("\nRegister values after Transmit test\n");
+    print_spi_registers();
 }
