@@ -1,3 +1,6 @@
+#ifndef BME280_H
+#define BME280_H
+
 enum {
 	BME280_REGISTER_CAL00 = 0x88, // calibration stored in 0x88 - 0xA1
 	BME280_REGISTER_CHIPID = 0xD0,
@@ -168,3 +171,5 @@ struct bme280
 	  };
 	  ctrl_hum _humReg;
 };
+
+#endif
