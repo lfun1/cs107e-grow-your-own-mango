@@ -123,12 +123,12 @@ void main(void) {
     printf("\nInitial register values\n");
     print_spi_registers();
 
-    dht_init();
-    dht_send_starter_sig();
-    read_bits();
+    /* dht_init(); */
+    /* dht_send_starter_sig(); */
+    /* read_bits(); */
     
     // //spi_setup1();
-    // spi_setup2();
+    spi_setup2();
 
     // // Confirmed default register values correct after SPI setup
     // //hexdump_spi();
@@ -138,7 +138,7 @@ void main(void) {
 
 
     // // Transmit data
-    // spi_tx_rx_test();
+    spi_tx_rx_test();
 
     // printf("\nRegister values after Transmit test\n");
     // print_spi_registers();

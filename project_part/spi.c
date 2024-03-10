@@ -113,7 +113,7 @@ void config_dummy_counter(void) {
 void config_total_trans_len(void) {
 	unsigned int val = 3;
 	*SPI_MTC_REG |= val; // MWTC = burst number sent to TXFIFO before automatically sending dummy bursts
-	*SPI_MBC_REG |= val + val; // total bursts including TXD, RXD, dummy burst
+	*SPI_MBC_REG |= val; // total bursts including TXD, RXD, dummy burst
 
 }
 
