@@ -58,7 +58,7 @@ static void spi_tx_rx_test(void) {
 
     // Start transmit
     // Turn on XCH
-    //start_transmit();
+    start_transmit();
 }
 
 
