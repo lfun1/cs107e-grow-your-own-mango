@@ -6,6 +6,8 @@
 #include "printf.h"
 #include "timer.h"
 
+//#include "bme280.h"
+
 
 static void show_pots(void) {
     while (1) {
@@ -46,10 +48,17 @@ static void read_soil_moisture(void) {
 void main(void)  {
     gpio_init();
     uart_init();
-    mcp3008_init();
+    uart_putstring("Starting main in final_sensors\n");
+    //mcp3008_init();
 
     //show_pots();
     //show_joystick();
     //show_on_off();
-    read_soil_moisture();
+    //read_soil_moisture();
+
+    // Test BME280
+    /* spi_init(); */
+    /* uint8 read_val = read8(BME280_REGISTER_CHIPID); */
+
+    /* printf("Read value at Chip ID: %x\n", read_val); */
 }
