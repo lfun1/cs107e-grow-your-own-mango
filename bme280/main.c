@@ -59,6 +59,7 @@ void main(void)  {
 
     // Test BME280
     spi_init();
+    printf("Chip ID reg: %x\n", BME280_REGISTER_CHIPID);
     uint8_t read_val = read8(BME280_REGISTER_CHIPID);
 
     printf("Read value at Chip ID: %x\n", read_val);
