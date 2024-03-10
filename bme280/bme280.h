@@ -1,6 +1,16 @@
 #ifndef BME280_H
 #define BME280_H
 
+/* BME280 Library */
+
+/* Read and write to BME280 Registers */
+uint8_t read8(uint8_t reg);
+void write8(uint8_t reg, uint8_t value);
+
+
+/* Registers copied from Adafruit BME280 LIbrary */
+// https://github.com/adafruit/Adafruit_BME280_Library/blob/9412f3d1a2e334a3415d79df706dad02925488aa/Adafruit_BME280.h
+
 enum {
 	BME280_REGISTER_CAL00 = 0x88, // calibration stored in 0x88 - 0xA1
 	BME280_REGISTER_CHIPID = 0xD0,
