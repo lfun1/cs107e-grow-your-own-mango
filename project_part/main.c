@@ -6,6 +6,7 @@
 #include "uart.h"
 #include "spi.h"
 #include "timer.h"
+#include "dht11.h"
 
 // Changed to unsigned char * to write/read 1 byte at a time to FIFO
 static unsigned char *SPI_TXD_REG = (unsigned char *)(SPI1_BASE_ADDRESS + SPI_TXD_OFFSET);
@@ -121,20 +122,24 @@ void main(void) {
 
     printf("\nInitial register values\n");
     print_spi_registers();
+
+    dht_init();
+    dht_send_starter_sig();
+    read_bits();
     
-    //spi_setup1();
-    spi_setup2();
+    // //spi_setup1();
+    // spi_setup2();
 
-    // Confirmed default register values correct after SPI setup
-    //hexdump_spi();
+    // // Confirmed default register values correct after SPI setup
+    // //hexdump_spi();
 
-    printf("\nRegister values after SPI config\n");
-    print_spi_registers();
+    // printf("\nRegister values after SPI config\n");
+    // print_spi_registers();
 
 
-    // Transmit data
-    spi_tx_rx_test();
+    // // Transmit data
+    // spi_tx_rx_test();
 
-    printf("\nRegister values after Transmit test\n");
-    print_spi_registers();
+    // printf("\nRegister values after Transmit test\n");
+    // print_spi_registers();
 }

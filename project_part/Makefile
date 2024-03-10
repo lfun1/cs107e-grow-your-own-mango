@@ -11,7 +11,7 @@ all : $(NAME).bin
 %.bin: %.elf
 	riscv64-unknown-elf-objcopy $< -O binary $@
 
-%.elf: %.o spi.o
+%.elf: %.o spi.o dht11.o
 	riscv64-unknown-elf-gcc $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 %.o: %.c

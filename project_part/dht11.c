@@ -25,29 +25,39 @@ void dht_init(void) {
 void dht_send_starter_sig(void) {
 	// set DHT_DATA low, the low hold time can not be less than 18ms (maximum can not exceed 30ms)
 	gpio_write(DHT_DATA, LOW);
+	unsigned long start_time = timer_get_ticks();
 	timer_delay_ms(20);
 	// then the microprocessor's I/O is set to input state.
-	gpio_set_input(DHT_DATA);
 	// set the DHT_DATA high so that the sensor will bring it low.
-	gpio_write(DHT_DATA, HIGH);
-
-	// wait for the sensor to pull the data low.
-	int count;
-	while (gpio_read(DHT_DATA)) {
-		if (++count > TIME_OUT) {
-			printf("30ms exceeded, sensor didn't pull the data low.");
-		}
+	if (!gpio_read(DHT_DATA)) {
+		uart_putchar('A');
 	}
+	gpio_write(DHT_DATA, HIGH);
+	gpio_set_input(DHT_DATA);
+	if (gpio_read(DHT_DATA)) {
+		uart_putchar('B');
+	}
+	// wait for the sensor to pull the data low.
+	int count = 0;
+	while (gpio_read(DHT_DATA)) {
+		// if (timer_get_ticks() - start_time > 40*1000*TICKS_PER_USEC) {
+		// 	break;
+		// }
+	}
+	printf("Out of the loop\n");
 }
 
 void read_bits(void) {
 	for (int i = 0; i <= DHT_TOTAL_BITS; i++) {
-		while (gpio_read(DHT_DATA)) {
+		if (gpio_read(DHT_DATA)) {
 			uart_putchar('1');
+			//uart_putchar('\n');
 		}
-		while (gpio_read(DHT_DATA)) {
+		else {
 			uart_putchar('0');
+			//uart_putchar('\n');
 		}
 	}
+	uart_putchar('\n');
 }
 
