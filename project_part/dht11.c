@@ -17,6 +17,9 @@ void dht_init(void) {
 	timer_delay(1);
 	// Set the DHT_DATA as output
 	gpio_set_output(DHT_DATA);
+	if (!gpio_read(DHT_DATA)) {
+		uart_putchar('W');
+	}
 	gpio_write(DHT_DATA, HIGH);
 	// Just delay for a bit.
 	timer_delay_ms(400);
