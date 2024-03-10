@@ -52,14 +52,13 @@ static void spi_tx_rx_test(void) {
     
     *SPI_TXD_REG = 0x1;
     *SPI_TXD_REG = 0x80;
-    *SPI_TXD_REG = 0x0;
+    *SPI_TXD_REG = 0x0; // If 
 
     spi_fifo_status();
 
     // Start transmit
     // Turn on XCH
-
-    start_transmit();
+    //start_transmit();
 }
 
 
