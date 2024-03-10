@@ -6,6 +6,7 @@
 
 #include "bme280.h"
 #include "spi.h"
+#include <stdint.h>
 
 uint8_t read8(uint8_t reg) {
     uint8_t tx[1], rx[1];
