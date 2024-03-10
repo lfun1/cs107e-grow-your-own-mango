@@ -23,12 +23,24 @@ void config_spi_PINS(void);
 
 void config_spi_sample_mode(void);
 
-void config_sample_mode(void);
+void config_clock_mode(void);
 
 void config_dummy_counter(void);
 
 void config_total_trans_len(void);
 
+void spi_module_enable(void);
+
+void config_master(void);
+
 void start_transmit(void);
 
 void print_spi_registers(void);
+
+void spi_fifo_status(void);
+
+void software_controller(void);
+
+void chip_select(void);
+
+void chip_deselect(void);

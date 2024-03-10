@@ -68,49 +68,73 @@ void config_spi_sample_mode(void) {
 	/* *SPI_TCR_REG = 0xFFFFF7FF; */
 	/* *SPI_TCR_REG |= val; */
 
-    // Turn on [11] = 0 (Normal operation), [13] = 1 (Normal sample mode)
+    // Turn on SDC[11] = 0 (Normal operation), SDM[13] = 1 (Normal sample mode)
     *SPI_TCR_REG &= ~(1 << 11);
     *SPI_TCR_REG |= (1 << 13);
 }
 
-void softaware_controller(void) {
+void software_controller(void) {
+    // Set SS_OWNER to 1 (software)
+    // Need to manually control SS signal in SS_LEVEL
 	*SPI_TCR_REG &= ~(1 << 6);
 	*SPI_TCR_REG |= (1 << 6);
 }
 
-void config_sample_mode(void) {
+void chip_select(void) {
+    // Manually control SS signal
+    // write 0 in SPI_TCR[7] sets SS to low (active)
+    *SPI_TCR_REG &= ~(1 << 7);
+}
+
+void chip_deselect(void) {
+    // Manually control SS signal
+    // write 1 in SPI_TCR[7] sets SS to high (not active)
+    *SPI_TCR_REG |= (1 << 7);
+}
+
+void config_clock_mode(void) {
 	// SPI_TCR[0][1] Choose Mode 0 [1] = 0, [0] = 0;
     // MCP3008 only supports Mode0, Mode3
 
-    // Set to Mode0
+    // Set to Mode0 with polarity = 0, phase = 0
     *SPI_TCR_REG &= ~0b11;
-    *SPI_TCR_REG |= 0b00; // CPOL[1] = 0, CPHA[0] = 0;
+    *SPI_TCR_REG |= 0b00; // CPOL[1] = 0, CPHA[0] = 0
 }
 
 void config_dummy_counter(void) {
-	// Default is zero.
-	// unsigned int val = 3;
-	// val <<= 24;
-	// val |= 0b11;
-	*SPI_BCC_REG |= 3;
+    /* Set up STC in SPI_BCC_REG */
+    // STC = SPI_BCC_REG[23:0] = 3 bursts sent in single mode before dummy bursts
+    *SPI_BCC_REG |= 3;
+
+    // DBC is ignored (not using dual SPI mode)
+
 }
 
 void config_total_trans_len(void) {
 	unsigned int val = 3;
-	*SPI_MTC_REG |= val;
-	*SPI_MBC_REG |= val + val;
+	*SPI_MTC_REG |= val; // MWTC = burst number sent to TXFIFO before automatically sending dummy bursts
+	*SPI_MBC_REG |= val + val; // total bursts including TXD, RXD, dummy burst
 
 }
 
-void config_slave_mas(void) {
-	*SPI_GCR_REG |= 0b11;
+void config_master(void) {
+    // SPI_GCR[1] = 1: Master Mode
+	*SPI_GCR_REG |= (1 << 1);
+}
+
+void spi_module_enable(void) {
+    // SPI_GCR[0] = 1: Enable SPI Module Control
+    *SPI_GCR_REG |= 1;    
 }
 
 void start_transmit(void) {
 	// *SPI_TCR_REG &= ~(1 << 7);
-	*SPI_TCR_REG &= 0x7FFFFFFF;
-	*SPI_TCR_REG |= 0x80000000; // Start transmit.
+	// *SPI_TCR_REG &= 0x7FFFFFFF;
+	// *SPI_TCR_REG |= 0x80000000; // Start transmit.
 	// printf("Clock value at address %p is: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
+
+    // Turn on XCH, SPI_TCR[31]
+	*SPI_TCR_REG |= (1 << 31); // Start transmit.
 }
 
 void stop_transmit(void) {
@@ -119,7 +143,30 @@ void stop_transmit(void) {
 }
 
 
+void print_spi_registers(void) {
+    // Print contents of all SPI registers
+    printf("SPI1_CLK_REG address %p contains: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
+    printf("SPI_BGR_REG address %p contains: %x\n", (void *)SPI_BGR_REG, *SPI_BGR_REG);
+    printf("SPI_GCR_REG address %p contains: %x\n", (void *)SPI_GCR_REG, *SPI_GCR_REG);
+    printf("SPI_TCR_REG address %p contains: %x\n", (void *)SPI_TCR_REG, *SPI_TCR_REG);
+    printf("SPI_BCC_REG address %p contains: %x\n", (void *)SPI_BCC_REG, *SPI_BCC_REG);
+    printf("SPI_MTC_REG address %p contains: %x\n", (void *)SPI_MTC_REG, *SPI_MTC_REG);
+    printf("SPI_MBC_REG address %p contains: %x\n", (void *)SPI_MBC_REG, *SPI_MBC_REG);
+}
 
+void hexdump_spi(void) {
+    printf("HEXDUMP SPI\n");
+    unsigned int *spi_ptr = (unsigned int *)SPI1_BASE_ADDRESS;
+    for (int i = 0; i < 20; i++) {
+        printf("Address %p has: %x\n", spi_ptr, *spi_ptr);
+        spi_ptr++; // add 4
+    }
+}
+
+void spi_fifo_status(void) {
+    unsigned int *fifo_status = (unsigned int *)(SPI1_BASE_ADDRESS + 0x1C);
+    printf("SPI FIFO STATUS at %p: %x\n", fifo_status, *fifo_status);
+}
 
 
 // void main(void) {
@@ -142,12 +189,3 @@ void stop_transmit(void) {
 // 	start_transmit();
 // }
 
-void print_spi_registers(void) {
-    // Print contents of all SPI registers
-    printf("SPI1_CLK_REG address %p contains: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
-    printf("SPI_BGR_REG address %p contains: %x\n", (void *)SPI_BGR_REG, *SPI_BGR_REG);
-    printf("SPI_TCR_REG address %p contains: %x\n", (void *)SPI_TCR_REG, *SPI_TCR_REG);
-    printf("SPI_BCC_REG address %p contains: %x\n", (void *)SPI_BCC_REG, *SPI_BCC_REG);
-    printf("SPI_MTC_REG address %p contains: %x\n", (void *)SPI_MTC_REG, *SPI_MTC_REG);
-    printf("SPI_MBC_REG address %p contains: %x\n", (void *)SPI_MBC_REG, *SPI_MBC_REG);
-}
