@@ -10,15 +10,37 @@
 static unsigned int *SPI_TXD_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_TXD_OFFSET);
 static unsigned int *SPI_RXD_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_RXD_OFFSET);
 
-void main(void) {
-    uart_init();
-    uart_putstring("Hello, world!\n");
-    printf("I am printf, here m%c %s!\n", 'e', "ROAR");
+static void spi_setup2(void) {
+    /* Turn on SPI Peripheral */
+    // Configure SPI Clock
+    //config_spi_clock();
+    /* // Enable SPI clock */
+    /* enable_spi_clock(); */
+    /* // De-assert SPI Reset */
+    /* de_assert_spi_reset(); */
+    
+    /* // Configure SPI PIN */
+    /* config_spi_PINS(); */
 
-    printf("Initial register values\n");
-    print_spi_registers();
+    /* /\* Set SPI as master *\/ */
+    /* config_master(); */
 
-    config_slave_mas();
+    /* // Configure SPI Sample mode */
+    /* config_spi_sample_mode(); */
+    
+    /* // Configure SPI mode */
+    /* config_clock_mode(); */
+    
+    /* /\* Enable SPI Peripheral *\/ */
+    /* // After all configuration is done */
+    /* spi_module_enable(); */
+    
+    
+}
+
+static void spi_setup1(void) {
+
+    config_master();
     
     // Enable SPI clock
     enable_spi_clock();
@@ -31,7 +53,7 @@ void main(void) {
     // Configure SPI Sample mode
     config_spi_sample_mode();
     // Configure SPI mode
-    config_sample_mode();
+    config_clock_mode();
     // Enable SPI control: Already set default 0.
     // Configure SPI data bus mode
     
@@ -43,9 +65,6 @@ void main(void) {
     
 
     // softaware_controller();
-
-    printf("Register values after SPI config\n");
-    print_spi_registers();
     
     // THE BYTES TO BE SENT
 
@@ -68,4 +87,20 @@ void main(void) {
         // Trying the value from the receiver.
         printf("Data after: %x\n", *SPI_TXD_REG);
     }
+}
+
+void main(void) {
+    uart_init();
+    uart_putstring("Hello, world!\n");
+    printf("I am printf, here m%c %s!\n", 'e', "ROAR");
+
+    printf("Initial register values\n");
+    print_spi_registers();
+
+    hexdump_spi();
+    //spi_setup1();
+    spi_setup2();
+
+    printf("Register values after SPI config\n");
+    print_spi_registers();
 }

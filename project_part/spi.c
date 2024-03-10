@@ -17,6 +17,14 @@ static unsigned int *SPI_MTC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MTC_
 static unsigned int *SPI_MBC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MBC_OFFSET);
 static unsigned int *SPI_GCR_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_GCR_OFFSET);
 
+
+void set_reg_defaults(void) {
+    *SPI_GCR_REG = 0x80;
+    *SPI_TCR_REG = 0x87;
+    // SPI_ISR at offset 0x0014 should have 0x32
+    // Continue...
+}
+
 void enable_spi_clock(void) {
     // Turn on clock in SPI1_SCLK_GATING
     // Write 1: Clock is ON to SPI1_CLK_REG[31]
@@ -68,7 +76,7 @@ void config_spi_sample_mode(void) {
 	/* *SPI_TCR_REG = 0xFFFFF7FF; */
 	/* *SPI_TCR_REG |= val; */
 
-    // Turn on [11] = 0 (Normal operation), [13] = 1 (Normal sample mode)
+    // Turn on SDC[11] = 0 (Normal operation), SDM[13] = 1 (Normal sample mode)
     *SPI_TCR_REG &= ~(1 << 11);
     *SPI_TCR_REG |= (1 << 13);
 }
@@ -78,13 +86,13 @@ void softaware_controller(void) {
 	*SPI_TCR_REG |= (1 << 6);
 }
 
-void config_sample_mode(void) {
+void config_clock_mode(void) {
 	// SPI_TCR[0][1] Choose Mode 0 [1] = 0, [0] = 0;
     // MCP3008 only supports Mode0, Mode3
 
-    // Set to Mode0
+    // Set to Mode0 with polarity = 0, phase = 0
     *SPI_TCR_REG &= ~0b11;
-    *SPI_TCR_REG |= 0b00; // CPOL[1] = 0, CPHA[0] = 0;
+    *SPI_TCR_REG |= 0b00; // CPOL[1] = 0, CPHA[0] = 0
 }
 
 void config_dummy_counter(void) {
@@ -102,8 +110,14 @@ void config_total_trans_len(void) {
 
 }
 
-void config_slave_mas(void) {
-	*SPI_GCR_REG |= 0b11;
+void config_master(void) {
+    // SPI_GCR[1] = 1: Master Mode
+	*SPI_GCR_REG |= (1 << 1);
+}
+
+void spi_module_enable(void) {
+    // SPI_GCR[0] = 1: Enable SPI Module Control
+    *SPI_GCR_REG |= 1;    
 }
 
 void start_transmit(void) {
@@ -119,6 +133,25 @@ void stop_transmit(void) {
 }
 
 
+void print_spi_registers(void) {
+    // Print contents of all SPI registers
+    printf("SPI1_CLK_REG address %p contains: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
+    printf("SPI_BGR_REG address %p contains: %x\n", (void *)SPI_BGR_REG, *SPI_BGR_REG);
+    printf("SPI_GCR_REG address %p contains: %x\n", (void *)SPI_GCR_REG, *SPI_GCR_REG);
+    printf("SPI_TCR_REG address %p contains: %x\n", (void *)SPI_TCR_REG, *SPI_TCR_REG);
+    printf("SPI_BCC_REG address %p contains: %x\n", (void *)SPI_BCC_REG, *SPI_BCC_REG);
+    printf("SPI_MTC_REG address %p contains: %x\n", (void *)SPI_MTC_REG, *SPI_MTC_REG);
+    printf("SPI_MBC_REG address %p contains: %x\n", (void *)SPI_MBC_REG, *SPI_MBC_REG);
+}
+
+void hexdump_spi(void) {
+    printf("HEXDUMP SPI\n");
+    unsigned int *spi_ptr = (unsigned int *)SPI1_BASE_ADDRESS;
+    for (int i = 0; i < 20; i++) {
+        printf("Address %p has: %x\n", spi_ptr, *spi_ptr);
+        spi_ptr++; // add 4
+    }
+}
 
 
 
@@ -142,12 +175,3 @@ void stop_transmit(void) {
 // 	start_transmit();
 // }
 
-void print_spi_registers(void) {
-    // Print contents of all SPI registers
-    printf("SPI1_CLK_REG address %p contains: %x\n", (void *)SPI1_CLK_REG, *SPI1_CLK_REG);
-    printf("SPI_BGR_REG address %p contains: %x\n", (void *)SPI_BGR_REG, *SPI_BGR_REG);
-    printf("SPI_TCR_REG address %p contains: %x\n", (void *)SPI_TCR_REG, *SPI_TCR_REG);
-    printf("SPI_BCC_REG address %p contains: %x\n", (void *)SPI_BCC_REG, *SPI_BCC_REG);
-    printf("SPI_MTC_REG address %p contains: %x\n", (void *)SPI_MTC_REG, *SPI_MTC_REG);
-    printf("SPI_MBC_REG address %p contains: %x\n", (void *)SPI_MBC_REG, *SPI_MBC_REG);
-}
