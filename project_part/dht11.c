@@ -34,7 +34,7 @@ void dht_send_starter_sig(void) {
 	}
 	gpio_write(DHT_DATA, HIGH);
 	gpio_set_input(DHT_DATA);
-	if (gpio_read(DHT_DATA)) {
+	if (!gpio_read(DHT_DATA)) {
 		uart_putchar('B');
 	}
 	// wait for the sensor to pull the data low.
