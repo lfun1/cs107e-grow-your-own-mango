@@ -17,14 +17,6 @@ static unsigned int *SPI_MTC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MTC_
 static unsigned int *SPI_MBC_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_MBC_OFFSET);
 static unsigned int *SPI_GCR_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_GCR_OFFSET);
 
-
-void set_reg_defaults(void) {
-    *SPI_GCR_REG = 0x80;
-    *SPI_TCR_REG = 0x87;
-    // SPI_ISR at offset 0x0014 should have 0x32
-    // Continue...
-}
-
 void enable_spi_clock(void) {
     // Turn on clock in SPI1_SCLK_GATING
     // Write 1: Clock is ON to SPI1_CLK_REG[31]

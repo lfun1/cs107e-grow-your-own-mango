@@ -13,29 +13,27 @@ static unsigned int *SPI_RXD_REG = (unsigned int *)(SPI1_BASE_ADDRESS + SPI_RXD_
 static void spi_setup2(void) {
     /* Turn on SPI Peripheral */
     // Configure SPI Clock
-    //config_spi_clock();
-    /* // Enable SPI clock */
-    /* enable_spi_clock(); */
-    /* // De-assert SPI Reset */
-    /* de_assert_spi_reset(); */
+    config_spi_clock();
+    // Enable SPI clock
+    enable_spi_clock();
+    // De-assert SPI Reset
+    de_assert_spi_reset();
     
-    /* // Configure SPI PIN */
-    /* config_spi_PINS(); */
+    // Configure SPI PIN
+    config_spi_PINS();
 
-    /* /\* Set SPI as master *\/ */
-    /* config_master(); */
+    /* Set SPI as master */
+    config_master();
 
-    /* // Configure SPI Sample mode */
-    /* config_spi_sample_mode(); */
+    // Configure SPI Sample mode
+    config_spi_sample_mode();
     
-    /* // Configure SPI mode */
-    /* config_clock_mode(); */
+    // Configure SPI mode
+    config_clock_mode();
     
-    /* /\* Enable SPI Peripheral *\/ */
-    /* // After all configuration is done */
-    /* spi_module_enable(); */
-    
-    
+    /* Enable SPI Peripheral */
+    // After all configuration is done
+    spi_module_enable();
 }
 
 static void spi_setup1(void) {
@@ -96,11 +94,15 @@ void main(void) {
 
     printf("Initial register values\n");
     print_spi_registers();
-
-    hexdump_spi();
+    
     //spi_setup1();
     spi_setup2();
 
+    // Confirmed default register values correct after SPI setup
+    //hexdump_spi();
+
     printf("Register values after SPI config\n");
     print_spi_registers();
+
+    // Transmit data
 }
