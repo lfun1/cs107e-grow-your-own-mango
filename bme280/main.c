@@ -66,17 +66,21 @@ static void print_bme280_reg(void) {
     printf("Address %x, value: %x\n", BME280_REGISTER_CHIPID, read8(BME280_REGISTER_CHIPID));
     printf("Address %x, value: %x\n", BME280_REGISTER_SOFTRESET, read8(BME280_REGISTER_SOFTRESET));
     
-    for (int i = 0xF2; i <= 0xFE; i++) {
+    for (int i = 0x88; i <= 0xFE; i++) {
         printf("Address %x, value: %x\n", i, read8(i));
     }
+
+    printf("\n\nStored calibration data\n");
 
     
 }
 
 static void test_bme280_config(void) {
-    print_bme280_reg();
+    //print_bme280_reg();
 
     bme_init();
+
+    printf("Temperature read: %d\n", (int)(readTemperature()*100));
     
     print_bme280_reg();
     

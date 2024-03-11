@@ -18,6 +18,8 @@ uint8_t read(uint8_t reg, int len);
 uint8_t read8(uint8_t reg);
 uint16_t read16(uint8_t reg);
 uint16_t read16_LE(uint8_t reg);
+int16_t readS16(uint8_t reg);
+int16_t readS16_LE(uint8_t reg);
 uint32_t read24(uint8_t reg);
 
 void write8(uint8_t reg, uint8_t value);
