@@ -11,6 +11,9 @@
 
 static bme280_calib_data _bme280_calib; //!< here calibration data is stored
 
+static void readCoefficients(void);
+static bool isReadingCalibration(void);
+
 /* BME280 init */
 bool bme_init(void) {
     uint8_t _sensorID = read8(BME280_REGISTER_CHIPID);
@@ -42,6 +45,12 @@ bool bme_init(void) {
     timer_delay_ms(100);
 
     return true;
+}
+
+/* Read Calibration */
+static bool isReadingCalibration(void) {
+  uint8_t const rStatus = read8(BME280_REGISTER_STATUS);
+  return (rStatus & (1 << 0)) != 0;
 }
 
 
@@ -103,8 +112,11 @@ void setSampling(sensor_mode_t mode,
 
 // Read `len` bytes starting from BME280 register `reg`
 // Only return the value in register `reg`
+#define MAX_LEN 4
+static uint8_t rx[MAX_LEN];
+
 uint8_t read(uint8_t reg, int len) {
-    uint8_t tx[len], rx[len];
+    uint8_t tx[len];
     tx[0] = (uint8_t)(reg | 0x80); // RW = '1' for read
     
     spi_transfer(tx, rx, len);
@@ -114,6 +126,22 @@ uint8_t read(uint8_t reg, int len) {
 
 uint8_t read8(uint8_t reg) {
     return read(reg, 2);
+}
+
+uint16_t read16(uint8_t reg) {
+    read(reg, 3);
+    return uint16_t(rx[1]) << 8 | uint16_t(rx[2]); // MSB first
+}
+
+uint32_t read24(uint8_t reg) {
+    read(reg, 4);
+    return uint32_t(rx[1]) << 16 | uint32_t(rx[2]) << 8 |
+        uint32_t(rx[3]); // MSB first
+}
+
+uint16_t read16_LE(uint8_t reg) {
+    uint16_t temp = read16(reg);
+    return (temp >> 8) | (temp << 8); // swap bytes
 }
 
 // Write `value` to BME280 register `reg`
