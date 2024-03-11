@@ -1,13 +1,22 @@
 #ifndef BME280_H
 #define BME280_H
 
-/* BME280 Library */
+/*
+ * BME280  Library (adapted from Adafruit BME280 Library)
+ * 
+ * Functions for collecting temperature, pressure, humidity data 
+ * from BME280 Sensor.
+ *
+ * Adafruit BME280 Library: https://github.com/adafruit/Adafruit_BME280_Library
+ *
+ * Lisa Fung, Elias Chikwanda
+ */
 
 #include "spi.h"
 #include <stdint.h>
 #include <stdbool.h>
 
-/* Registers copied from Adafruit BME280 LIbrary */
+/* Registers and functions copied from Adafruit BME280 Library */
 // https://github.com/adafruit/Adafruit_BME280_Library/blob/9412f3d1a2e334a3415d79df706dad02925488aa/Adafruit_BME280.h
 
 /* Init BME280 */
@@ -16,10 +25,13 @@ bool bme_init(void);
 /* Read and write to BME280 Registers */
 uint8_t read(uint8_t reg, int len);
 uint8_t read8(uint8_t reg);
+
 uint16_t read16(uint8_t reg);
-uint16_t read16_LE(uint8_t reg);
-int16_t readS16(uint8_t reg);
-int16_t readS16_LE(uint8_t reg);
+uint16_t read16_LE(uint8_t reg); // little endian
+
+int16_t readS16(uint8_t reg); // signed
+int16_t readS16_LE(uint8_t reg); // signed, little endian
+
 uint32_t read24(uint8_t reg);
 
 void write8(uint8_t reg, uint8_t value);
@@ -31,51 +43,51 @@ float readTemperature(void);
 float readPressure(void);
 float readHumidity(void);
 
-float readAltitude(float seaLevel);
-float seaLevelForAltitude(float altitude, float pressure);
+// Altitude measurements not supported (`pow` function not supported)
+//float readAltitude(float seaLevel);
+//float seaLevelForAltitude(float altitude, float pressure);
 uint32_t sensorID(void);
 
 float getTemperatureCompensation(void);
 void setTemperatureCompensation(float);
 
-
 /* Registers */
 
 enum {
-  BME280_REGISTER_DIG_T1 = 0x88,
-  BME280_REGISTER_DIG_T2 = 0x8A,
-  BME280_REGISTER_DIG_T3 = 0x8C,
+    BME280_REGISTER_DIG_T1 = 0x88,
+    BME280_REGISTER_DIG_T2 = 0x8A,
+    BME280_REGISTER_DIG_T3 = 0x8C,
 
-  BME280_REGISTER_DIG_P1 = 0x8E,
-  BME280_REGISTER_DIG_P2 = 0x90,
-  BME280_REGISTER_DIG_P3 = 0x92,
-  BME280_REGISTER_DIG_P4 = 0x94,
-  BME280_REGISTER_DIG_P5 = 0x96,
-  BME280_REGISTER_DIG_P6 = 0x98,
-  BME280_REGISTER_DIG_P7 = 0x9A,
-  BME280_REGISTER_DIG_P8 = 0x9C,
-  BME280_REGISTER_DIG_P9 = 0x9E,
+    BME280_REGISTER_DIG_P1 = 0x8E,
+    BME280_REGISTER_DIG_P2 = 0x90,
+    BME280_REGISTER_DIG_P3 = 0x92,
+    BME280_REGISTER_DIG_P4 = 0x94,
+    BME280_REGISTER_DIG_P5 = 0x96,
+    BME280_REGISTER_DIG_P6 = 0x98,
+    BME280_REGISTER_DIG_P7 = 0x9A,
+    BME280_REGISTER_DIG_P8 = 0x9C,
+    BME280_REGISTER_DIG_P9 = 0x9E,
 
-  BME280_REGISTER_DIG_H1 = 0xA1,
-  BME280_REGISTER_DIG_H2 = 0xE1,
-  BME280_REGISTER_DIG_H3 = 0xE3,
-  BME280_REGISTER_DIG_H4 = 0xE4,
-  BME280_REGISTER_DIG_H5 = 0xE5,
-  BME280_REGISTER_DIG_H6 = 0xE7,
+    BME280_REGISTER_DIG_H1 = 0xA1,
+    BME280_REGISTER_DIG_H2 = 0xE1,
+    BME280_REGISTER_DIG_H3 = 0xE3,
+    BME280_REGISTER_DIG_H4 = 0xE4,
+    BME280_REGISTER_DIG_H5 = 0xE5,
+    BME280_REGISTER_DIG_H6 = 0xE7,
 
-  BME280_REGISTER_CHIPID = 0xD0,
-  BME280_REGISTER_VERSION = 0xD1,
-  BME280_REGISTER_SOFTRESET = 0xE0,
+    BME280_REGISTER_CHIPID = 0xD0,
+    BME280_REGISTER_VERSION = 0xD1,
+    BME280_REGISTER_SOFTRESET = 0xE0,
 
-  BME280_REGISTER_CAL26 = 0xE1, // R calibration stored in 0xE1-0xF0
+    BME280_REGISTER_CAL26 = 0xE1, // R calibration stored in 0xE1-0xF0
 
-  BME280_REGISTER_CONTROLHUMID = 0xF2,
-  BME280_REGISTER_STATUS = 0XF3,
-  BME280_REGISTER_CONTROL = 0xF4,
-  BME280_REGISTER_CONFIG = 0xF5,
-  BME280_REGISTER_PRESSUREDATA = 0xF7,
-  BME280_REGISTER_TEMPDATA = 0xFA,
-  BME280_REGISTER_HUMIDDATA = 0xFD
+    BME280_REGISTER_CONTROLHUMID = 0xF2,
+    BME280_REGISTER_STATUS = 0XF3,
+    BME280_REGISTER_CONTROL = 0xF4,
+    BME280_REGISTER_CONFIG = 0xF5,
+    BME280_REGISTER_PRESSUREDATA = 0xF7,
+    BME280_REGISTER_TEMPDATA = 0xFA,
+    BME280_REGISTER_HUMIDDATA = 0xFD
 };
 
 /* Calibration data */
@@ -153,47 +165,6 @@ void setSampling(sensor_mode_t mode,
                  sensor_filter_t filter,
                  standby_duration_t duration);
 
-/* 	  bool init(); */
-/* 	  void setSampling(sensor_mode mode = MODE_NORMAL, */
-/*                    sensor_sampling tempSampling = SAMPLING_X16, */
-/*                    sensor_sampling pressSampling = SAMPLING_X16, */
-/*                    sensor_sampling humSampling = SAMPLING_X16, */
-/*                    sensor_filter filter = FILTER_OFF, */
-/*                    standby_duration duration = STANDBY_MS_0_5); */
-
-/* 	  bool takeForcedMeasurement(void); */
-/* 	  float readTemperature(void); */
-/* 	  float readPressure(void); */
-/* 	  float readHumidity(void); */
-
-/* 	  float getTemperatureCompensation(void); */
-/* 	  void setTemperatureCompensation(float); */
-
-/* 	  Adafruit_Sensor *getTemperatureSensor(void); */
-/* 	  Adafruit_Sensor *getPressureSensor(void); */
-/* 	  Adafruit_Sensor *getHumiditySensor(void); */
-
-/* 	  // Meant to be protected. */
-/* 	  SPIDevice *spi_dev = NULL; ///< Pointer to SPI bus interface */
-/* 	  BME280_Temp *temp_sensor = NULL; */
-/* 	  BME280_Pressure *pressure_sensor = NULL; */
-/* 	  BME280_Humidity *humidity_sensor = NULL; */
-/* 	  int32_t _sensorID; */
-/* 	  int32_t t_fine; */
-/* 	  int32_t t_fine_adjust = 0; */
-/* 	  bme280_calib_data _bme280_calib; //!< here calibration data is stored */
-
-/* 	  void readCoefficients(void); */
-/* 	  bool isReadingCalibration(void); */
-
-/* 	  void write8(byte reg, byte value); */
-/* 	  uint8_t read8(byte reg); */
-/* 	  uint16_t read16(byte reg); */
-/* 	  // uint32_t read24(byte reg); */
-/* 	  int16_t readS16(byte reg); */
-/* 	  uint16_t read16_LE(byte reg); // little endian */
-/* 	  int16_t readS16_LE(byte reg); // little endian */
-
 struct config {
     // inactive duration (standby time) in normal mode
     // 000 = 0.5 ms
@@ -220,15 +191,7 @@ struct config {
 
     /// @return combined config register
     unsigned int (*get)(struct config *configReg);
-    // { return (t_sb << 5) | (filter << 2) | spi3w_en; };
 };
-
-/* unsigned int config_get(struct config *configReg) { */
-/*     return (configReg->t_sb << 5) | (configReg->filter << 2) | configReg->spi3w_en; */
-/* } */
-
-/* struct config _configReg; */
-
 
 struct ctrl_meas {
     // temperature oversampling
@@ -260,8 +223,6 @@ struct ctrl_meas {
     //unsigned int get() { return (osrs_t << 5) | (osrs_p << 2) | mode; }
 };
 
-// ctrl_meas _measReg;
-
 struct ctrl_hum {
     /// unused - don't set
     unsigned int none : 5;
@@ -279,6 +240,5 @@ struct ctrl_hum {
     unsigned int (*get)(struct ctrl_hum *humReg);
     //unsigned int get() { return (osrs_h); }
 };
-//ctrl_hum _humReg;
 
 #endif
