@@ -7,7 +7,7 @@
 #include "timer.h"
 
 #include "bme280.h"
-#include "spi.h"
+//#include "spi.h"
 
 
 static void show_pots(void) {
@@ -59,8 +59,19 @@ void main(void)  {
 
     // Test BME280
     spi_init();
+
     printf("Chip ID reg: %x\n", BME280_REGISTER_CHIPID);
     uint8_t read_val = read8(BME280_REGISTER_CHIPID);
 
     printf("Read value at Chip ID: %x\n", read_val);
+    
+    printf("Read reset value: %x\n", read8(BME280_REGISTER_SOFTRESET));
+
+    write8(BME280_REGISTER_SOFTRESET, 0xB6); // power-on reset
+
+    timer_delay_ms(100);
+
+    printf("Read reset value: %x\n", read8(BME280_REGISTER_SOFTRESET));
+    
+    
 }
