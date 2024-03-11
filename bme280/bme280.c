@@ -55,6 +55,9 @@ bool bme_init(void) {
     return true;
 }
 
+/* Return sensor ID */
+uint32_t sensorID(void) { return _sensorID; }
+
 /* Read Calibration */
 static bool isReadingCalibration(void) {
     uint8_t const rStatus = read8(BME280_REGISTER_STATUS);
@@ -227,6 +230,50 @@ float readHumidity(void) {
 
     return (float)H / 1024.0;
 }
+
+/* Forced Measurement */
+bool takeForcedMeasurement(void) {
+    bool return_value = false;
+    // If we are in forced mode, the BME sensor goes back to sleep after each
+    // measurement and we need to set it to forced mode once at this point, so
+    // it will take the next measurement and then return to sleep again.
+    // In normal mode simply does new measurements periodically.
+    if (_measReg.mode == MODE_FORCED) {
+        return_value = true;
+        // set to forced mode, i.e. "take next measurement"
+        write8(BME280_REGISTER_CONTROL, _measReg.get(&_measReg));
+        // Store current time to measure the timeout
+        //uint32_t timeout_start = millis();
+        unsigned long timeout_start = timer_get_ticks();
+        
+        // wait until measurement has been completed, otherwise we would read the
+        // the values from the last measurement or the timeout occurred after 2 sec.
+        while (read8(BME280_REGISTER_STATUS) & 0x08) {
+            // In case of a timeout, stop the while loop
+            if ((timer_get_ticks() - timeout_start) > 2000*1000*TICKS_PER_USEC) {
+                return_value = false;
+                break;
+            }
+            timer_delay_ms(1);
+        }
+    }
+    return return_value;
+}
+
+
+/* Read Altitude */
+// Removed because <cmath> is not supported for `pow` function
+/* float readAltitude(float seaLevel) { */
+/*     // Equation taken from BMP180 datasheet (page 16): */
+/*     //  http://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf */
+
+/*     // Note that using the equation from wikipedia can give bad results */
+/*     // at high altitude. See this thread for more information: */
+/*     //  http://forums.adafruit.com/viewtopic.php?f=22&t=58064 */
+
+/*     float atmospheric = readPressure() / 100.0F; */
+/*     return 44330.0 * (1.0 - pow(atmospheric / seaLevel, 0.1903)); */
+/* } */
 
 
 /* Read and Write to BME280 Registers */

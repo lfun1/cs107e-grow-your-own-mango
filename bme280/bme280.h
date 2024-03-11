@@ -31,7 +31,9 @@ float readTemperature(void);
 float readPressure(void);
 float readHumidity(void);
 
-// Add altitude later
+float readAltitude(float seaLevel);
+float seaLevelForAltitude(float altitude, float pressure);
+uint32_t sensorID(void);
 
 float getTemperatureCompensation(void);
 void setTemperatureCompensation(float);
