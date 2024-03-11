@@ -1,15 +1,20 @@
 /* 
- * BME280 Library Implementations
+ * BME280 Library Implementation
+ * 
+ * Adapted from Adafruit BME280 Library: 
+ * https://github.com/adafruit/Adafruit_BME280_Library
+ * 
  * Lisa Fung, Elias Chikwanda
- * March 10, 2024 
+ * March 10, 2024
  */
 
 #include "bme280.h"
 #include "timer.h"
 #include "printf.h"
 
+/* Calibration structs and variables */
 
-bme280_calib_data _bme280_calib; //!< here calibration data is stored
+static bme280_calib_data _bme280_calib; //!< here calibration data is stored
 
 static int32_t _sensorID; //!< ID of the BME Sensor
 static int32_t t_fine; //!< temperature with high resolution, stored as an attribute
@@ -23,6 +28,7 @@ static void readCoefficients(void);
 static bool isReadingCalibration(void);
 
 /* BME280 init */
+
 bool bme_init(void) {
     _sensorID = read8(BME280_REGISTER_CHIPID);
 
@@ -56,15 +62,18 @@ bool bme_init(void) {
 }
 
 /* Return sensor ID */
+
 uint32_t sensorID(void) { return _sensorID; }
 
-/* Read Calibration */
+/* Read Calibration Status */
+
 static bool isReadingCalibration(void) {
     uint8_t const rStatus = read8(BME280_REGISTER_STATUS);
     return (rStatus & (1 << 0)) != 0;
 }
 
-/* Read Coefficients */
+/* Read Calibration Coefficients */
+
 void readCoefficients(void) {
     _bme280_calib.dig_T1 = read16_LE(BME280_REGISTER_DIG_T1);
     _bme280_calib.dig_T2 = readS16_LE(BME280_REGISTER_DIG_T2);
@@ -94,7 +103,6 @@ void readCoefficients(void) {
 static unsigned int config_get(struct config *configReg) {
     return (configReg->t_sb << 5) | (configReg->filter << 2) | configReg->spi3w_en;
 }
-
 static struct config _configReg = {.get = config_get,};
 
 
@@ -102,7 +110,6 @@ static struct config _configReg = {.get = config_get,};
 static unsigned int meas_get(struct ctrl_meas *measReg) {
     return (measReg->osrs_t << 5) | (measReg->osrs_p << 2) | measReg->mode;    
 }
-
 static struct ctrl_meas _measReg = {.get = meas_get,};
 
 
@@ -110,11 +117,11 @@ static struct ctrl_meas _measReg = {.get = meas_get,};
 static unsigned int hum_get(struct ctrl_hum *humReg) {
     return (humReg->osrs_h);   
 }
-
 static struct ctrl_hum _humReg = {.get = hum_get,};
 
 
 /* Set Sampling */
+
 void setSampling(sensor_mode_t mode,
                  sensor_sampling_t tempSampling,
                  sensor_sampling_t pressSampling,
@@ -145,6 +152,7 @@ void setSampling(sensor_mode_t mode,
 
 
 /* Read Temperature */
+
 float readTemperature(void) {
     int32_t var1, var2;
 
@@ -231,7 +239,8 @@ float readHumidity(void) {
     return (float)H / 1024.0;
 }
 
-/* Forced Measurement */
+/* Forced Mode Measurement */
+
 bool takeForcedMeasurement(void) {
     bool return_value = false;
     // If we are in forced mode, the BME sensor goes back to sleep after each
@@ -262,7 +271,8 @@ bool takeForcedMeasurement(void) {
 
 
 /* Read Altitude */
-// Removed because <cmath> is not supported for `pow` function
+
+// Removed because <cmath> is not supported (for `pow` function)
 /* float readAltitude(float seaLevel) { */
 /*     // Equation taken from BMP180 datasheet (page 16): */
 /*     //  http://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf */
@@ -276,15 +286,27 @@ bool takeForcedMeasurement(void) {
 /* } */
 
 
+/* Temperature Compensation */
+
+float getTemperatureCompensation(void) {
+    return (float)((t_fine_adjust * 5) >> 8) / 100.0;
+};
+
+void setTemperatureCompensation(float adjustment) {
+    // convert the value in C into and adjustment to t_fine
+    t_fine_adjust = (((int32_t)(adjustment * 100) << 8)) / 5;
+};
+
+
 /* Read and Write to BME280 Registers */
+
+#define MAX_LEN 4    // maximum 3 bytes read
+static uint8_t rx[MAX_LEN]; // received values (MISO)
 
 // Read `len` bytes starting from BME280 register `reg`
 // Only return the value in register `reg`
-#define MAX_LEN 4
-static uint8_t rx[MAX_LEN];
-
 uint8_t read(uint8_t reg, int len) {
-    uint8_t tx[len];
+    uint8_t tx[len]; // transmit values (MOSI)
     tx[0] = (uint8_t)(reg | 0x80); // RW = '1' for read
     
     spi_transfer(tx, rx, len);
@@ -320,8 +342,8 @@ int16_t readS16_LE(uint8_t reg) {
 
 // Write `value` to BME280 register `reg`
 void write8(uint8_t reg, uint8_t value) {
-    uint8_t tx[2], rx[2];
+    uint8_t tx[2], rx_write[2];
     tx[0] = (uint8_t) (reg & ~0x80); // RW = '0' for write
     tx[1] = value;
-    spi_transfer(tx, rx, 2);
+    spi_transfer(tx, rx_write, 2);
 }
