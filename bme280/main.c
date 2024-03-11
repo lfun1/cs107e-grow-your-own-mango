@@ -61,6 +61,27 @@ static void test_bme280_read_write(void) {
     printf("Read reset value: %x\n", read8(BME280_REGISTER_SOFTRESET));
 }
 
+static void print_bme280_reg(void) {
+    printf("All BME280 Register values:\n");
+    printf("Address %x, value: %x\n", BME280_REGISTER_CHIPID, read8(BME280_REGISTER_CHIPID));
+    printf("Address %x, value: %x\n", BME280_REGISTER_SOFTRESET, read8(BME280_REGISTER_SOFTRESET));
+    
+    for (int i = 0xF2; i <= 0xFE; i++) {
+        printf("Address %x, value: %x\n", i, read8(i));
+    }
+
+    
+}
+
+static void test_bme280_config(void) {
+    print_bme280_reg();
+
+    bme_init();
+    
+    print_bme280_reg();
+    
+}
+
 void main(void)  {
     gpio_init();
     uart_init();
@@ -75,7 +96,5 @@ void main(void)  {
     // Test BME280
     spi_init();
 
-    
-    
-    
+    test_bme280_config();    
 }

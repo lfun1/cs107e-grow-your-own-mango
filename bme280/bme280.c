@@ -8,8 +8,11 @@
 #include "timer.h"
 #include "printf.h"
 
+
+static bme280_calib_data _bme280_calib; //!< here calibration data is stored
+
 /* BME280 init */
-bool init(void) {
+bool bme_init(void) {
     uint8_t _sensorID = read8(BME280_REGISTER_CHIPID);
 
     if (_sensorID != 0x60)
