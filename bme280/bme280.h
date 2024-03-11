@@ -5,9 +5,10 @@
 
 #include "spi.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 /* Init BME280 */
-
+bool init(void);
 
 /* Read and write to BME280 Registers */
 uint8_t read(uint8_t reg, int len);
@@ -76,6 +77,12 @@ enum standby_duration {
     STANDBY_MS_1000 = 0b101
 };
 
+void setSampling(sensor_mode_t mode,
+                 sensor_sampling_t tempSampling,
+                 sensor_sampling_t pressSampling,
+                 sensor_sampling_t humSampling,
+                 sensor_filter_t filter,
+                 standby_duration_t duration);
 
 /* 	  bool init(); */
 /* 	  void setSampling(sensor_mode mode = MODE_NORMAL, */
