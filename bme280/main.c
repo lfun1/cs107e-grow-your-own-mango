@@ -81,8 +81,12 @@ static void test_bme280_config(void) {
     bme_init();
 
     printf("Temperature read: %d\n", (int)(readTemperature()*100));
+
+    printf("Pressure read: %d\n", (int)(readPressure()));
+
+    printf("Humidity read: %d\n", (int)(readHumidity()));
     
-    print_bme280_reg();
+    //print_bme280_reg();
     
 }
 

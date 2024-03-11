@@ -162,7 +162,71 @@ float readTemperature(void) {
     return (float)T / 100;
 }
 
+/* Read Pressure */
 
+float readPressure(void) {
+    int64_t var1, var2, var3, var4;
+
+    readTemperature(); // must be done first to get t_fine
+
+    int32_t adc_P = read24(BME280_REGISTER_PRESSUREDATA);
+    if (adc_P == 0x800000) // value in case pressure measurement was disabled
+        return -1;
+    adc_P >>= 4;
+
+    var1 = ((int64_t)t_fine) - 128000;
+    var2 = var1 * var1 * (int64_t)_bme280_calib.dig_P6;
+    var2 = var2 + ((var1 * (int64_t)_bme280_calib.dig_P5) * 131072);
+    var2 = var2 + (((int64_t)_bme280_calib.dig_P4) * 34359738368);
+    var1 = ((var1 * var1 * (int64_t)_bme280_calib.dig_P3) / 256) +
+        ((var1 * ((int64_t)_bme280_calib.dig_P2) * 4096));
+    var3 = ((int64_t)1) * 140737488355328;
+    var1 = (var3 + var1) * ((int64_t)_bme280_calib.dig_P1) / 8589934592;
+
+    if (var1 == 0) {
+        return 0; // avoid exception caused by division by zero
+    }
+
+    var4 = 1048576 - adc_P;
+    var4 = (((var4 * 2147483648) - var2) * 3125) / var1;
+    var1 = (((int64_t)_bme280_calib.dig_P9) * (var4 / 8192) * (var4 / 8192)) / 33554432;
+    var2 = (((int64_t)_bme280_calib.dig_P8) * var4) / 524288;
+    var4 = ((var4 + var1 + var2) / 256) + (((int64_t)_bme280_calib.dig_P7) * 16);
+
+    float P = var4 / 256.0;
+
+    return P;
+}
+
+/* Read Humidity */
+
+float readHumidity(void) {
+    int32_t var1, var2, var3, var4, var5;
+
+    readTemperature(); // must be done first to get t_fine
+
+    int32_t adc_H = read16(BME280_REGISTER_HUMIDDATA);
+    if (adc_H == 0x8000) // value in case humidity measurement was disabled
+        return -1;
+
+    var1 = t_fine - ((int32_t)76800);
+    var2 = (int32_t)(adc_H * 16384);
+    var3 = (int32_t)(((int32_t)_bme280_calib.dig_H4) * 1048576);
+    var4 = ((int32_t)_bme280_calib.dig_H5) * var1;
+    var5 = (((var2 - var3) - var4) + (int32_t)16384) / 32768;
+    var2 = (var1 * ((int32_t)_bme280_calib.dig_H6)) / 1024;
+    var3 = (var1 * ((int32_t)_bme280_calib.dig_H3)) / 2048;
+    var4 = ((var2 * (var3 + (int32_t)32768)) / 1024) + (int32_t)2097152;
+    var2 = ((var4 * ((int32_t)_bme280_calib.dig_H2)) + 8192) / 16384;
+    var3 = var5 * var2;
+    var4 = ((var3 / 32768) * (var3 / 32768)) / 128;
+    var5 = var3 - ((var4 * ((int32_t)_bme280_calib.dig_H1)) / 16);
+    var5 = (var5 < 0 ? 0 : var5);
+    var5 = (var5 > 419430400 ? 419430400 : var5);
+    uint32_t H = (uint32_t)(var5 / 4096);
+
+    return (float)H / 1024.0;
+}
 
 
 /* Read and Write to BME280 Registers */
