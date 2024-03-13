@@ -8,6 +8,10 @@
 #include "malloc.h"
 #include "assert.h"
 #include "printf.h"
+#include "strings.h"
+
+#define DATA_SIZE 4
+#define LINE_LEN 40
 
 static struct {
     color_t bg_color, fg_color;
@@ -22,6 +26,10 @@ static struct {
     .panes_y = NULL,
     //.contents = NULL,
 };
+
+void data_strings_init(void);
+
+static char *data_strings[4];
 
 const static int LINE_SPACING = 5;
 
@@ -65,6 +73,13 @@ void dashboard_init(int nrows, int ncols, color_t foreground, color_t background
         module.panes_y[y] = corner_y;
         corner_y += module.pane_height + module.interior_gap;
     }
+
+    // Initialiaze the strings to show.
+    for (int k = 0; k < DATA_SIZE; k++) {
+        data_strings[k] = malloc(LINE_LEN);
+        data_strings[k][0] = '\0'; // Initialize line with a null pointer for concatenating.
+    }
+    data_strings_init();
     
     // Initialize contents memory
     //int nchars = module.nrows * module.ncols;
@@ -76,6 +91,13 @@ void dashboard_init(int nrows, int ncols, color_t foreground, color_t background
 
     gl_clear(module.bg_color); // Clear framebuffer
     gl_swap_buffer(); // Show contents
+}
+
+void data_strings_init(void) {
+    strlcat(data_strings[0], "Temperature: ", LINE_LEN);
+    strlcat(data_strings[1], "Soil Moisture: ", LINE_LEN);
+    strlcat(data_strings[2], "Humidity:  ", LINE_LEN);
+    strlcat(data_strings[3], "Pressure: ", LINE_LEN);
 }
 
 void dashboard_draw_outline(void) {
@@ -107,6 +129,13 @@ typedef struct {
     color_t c_axes, c_points;
 } graph_t;
 
+typedef struct {
+    int x, y;
+    const char *title;
+    int temp, soil_mois, humidty, pressure;
+    color_t c_contents;
+} processed_data_t;
+
 // Draw title, clip if too long
 // x, y are the pane index
 // Currently only supports one line for title
@@ -126,12 +155,45 @@ static void dashboard_draw_title(int x, int y, const char* title, color_t c) {
     }
 }
 
+static void dashboard_draw_data(processed_data_t this_data) {
+    dashboard_draw_title(this_data.x, this_data.y, this_data.title, this_data.c_contents);
+    int ch_height = gl_get_char_height();
+
+    int x_start = module.panes_x[this_data.x] + LINE_SPACING + 2 * gl_get_char_width();
+    int y_start = module.panes_y[this_data.y] + LINE_SPACING + 2 * ch_height;
+    // int y_end = y_start module.pane_height;
+    int cur_y = y_start;
+
+    for (int i = 0; i < DATA_SIZE; i++) {
+        gl_draw_string(x_start, cur_y, data_strings[i], this_data.c_contents);
+        cur_y += ch_height + LINE_SPACING;
+    }
+}
+
 static void dashboard_draw_graph(graph_t graph) {
     dashboard_draw_title(graph.x, graph.y, graph.title, graph.c_axes);
     
     for (int i = 0; i < 4; i++) {
         printf("%d\n", ((int *)graph.data)[i]);
     }
+}
+
+static void draw_data_test(void) {
+    processed_data_t data_today;
+    data_today.x = 0, data_today.y = 0;
+    data_today.title = "Today";
+    data_today.temp = 0, data_today.soil_mois = 0, data_today.pressure = 0;
+    data_today.c_contents = GL_BLACK;
+
+    dashboard_draw_data(data_today);
+
+    processed_data_t data_yes;
+    data_yes.x = 0, data_yes.y = 1;
+    data_yes.title = "Yesterday";
+    data_yes.temp = 0, data_yes.soil_mois = 0, data_yes.pressure = 0;
+    data_yes.c_contents = GL_BLACK;
+
+    dashboard_draw_data(data_yes);
 }
 
 static void dashboard_test(void) {
@@ -156,5 +218,6 @@ static void dashboard_test(void) {
 
 void dashboard_show(void) {
     dashboard_test();
+    draw_data_test();
     gl_swap_buffer();
 }
