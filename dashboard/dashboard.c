@@ -137,7 +137,8 @@ typedef struct {
 typedef struct {
     int x, y;
     const char *title;
-    int temp, soil_mois, humidty, pressure;
+    float temp, soil_mois, humidty;
+    int pressure;
     color_t c_contents;
 } processed_data_t;
 
@@ -174,17 +175,22 @@ static void dashboard_draw_data(processed_data_t this_data) {
         // Join the values with the strings
         buf[0] = '\0';
         size_t line_len = 0;
+        int num_dec = 0;
         switch (i) {
             case TEMP_INDEX:
-                snprintf(buf, LINE_LEN, "%d F", this_data.temp);
+                num_dec = (int)this_data.temp;
+                snprintf(buf, LINE_LEN, "%d.%02d F", (int)this_data.temp, (int)((this_data.temp - num_dec) * 100));
                 break;
             case SOIL_INDEX:
-                snprintf(buf, LINE_LEN, "%d Perc", this_data.soil_mois);
+                num_dec = (int)this_data.soil_mois;
+                snprintf(buf, LINE_LEN, "%d.%02d Perc", (int)this_data.soil_mois, (int)((this_data.soil_mois - num_dec) * 100));
                 break;
             case HUMI_INDEX:
-                snprintf(buf, LINE_LEN, "%d Perc", this_data.humidty);
+                num_dec = (int)this_data.humidty;
+                snprintf(buf, LINE_LEN, "%d.%02d Perc", (int)this_data.humidty, (int)((this_data.humidty - num_dec) * 100));
                 break;
             case PRES_INDEX:
+                num_dec = (int)this_data.pressure;
                 snprintf(buf, LINE_LEN, "%d Pa", this_data.pressure);
                 break;
         }
@@ -208,8 +214,8 @@ static void draw_data_test(void) {
     processed_data_t data_today;
     data_today.x = 0, data_today.y = 0;
     data_today.title = "Today";
-    data_today.temp = 50, data_today.soil_mois = 45, data_today.pressure = 101325;
-    data_today.humidty = 100;
+    data_today.temp = 50.23, data_today.soil_mois = 45.20, data_today.pressure = 101325;
+    data_today.humidty = 99.99;
     data_today.c_contents = GL_BLACK;
 
     dashboard_draw_data(data_today);
@@ -217,8 +223,8 @@ static void draw_data_test(void) {
     processed_data_t data_yes;
     data_yes.x = 0, data_yes.y = 1;
     data_yes.title = "Yesterday";
-    data_yes.temp = 80, data_yes.soil_mois = 56, data_yes.pressure = 101000;
-    data_yes.humidty = 75;
+    data_yes.temp = 80.45, data_yes.soil_mois = 56.35, data_yes.pressure = 101000;
+    data_yes.humidty = 75.25;
     data_yes.c_contents = GL_BLACK;
 
     dashboard_draw_data(data_yes);
