@@ -12,7 +12,7 @@
 #include "printf.h"
 
 #define DATA_SIZE 4
-#define LINE_LEN 40
+#define LINE_LEN 26
 #define TEMP_INDEX 0
 #define SOIL_INDEX 1
 #define HUMI_INDEX 2
@@ -168,31 +168,31 @@ static void dashboard_draw_data(processed_data_t this_data) {
     int y_start = module.panes_y[this_data.y] + LINE_SPACING + 2 * ch_height;
     // int y_end = y_start module.pane_height;
     int cur_y = y_start;
+    char buf[LINE_LEN];
 
     for (int i = 0; i < DATA_SIZE; i++) {
         // Join the values with the strings
-        char buf[LINE_LEN];
         buf[0] = '\0';
+        size_t line_len = 0;
         switch (i) {
             case TEMP_INDEX:
                 snprintf(buf, LINE_LEN, "%d F", this_data.temp);
-                printf("%s\n", buf);
-                strlcat(data_strings[i], buf, LINE_LEN);
+                break;
             case SOIL_INDEX:
-                snprintf(buf, LINE_LEN, "%d", this_data.soil_mois);
-                strlcat(data_strings[i], buf, LINE_LEN);
+                snprintf(buf, LINE_LEN, "%d Perc", this_data.soil_mois);
+                break;
             case HUMI_INDEX:
-                snprintf(buf, LINE_LEN, "%d", this_data.humidty);
-                strlcat(data_strings[i], buf, LINE_LEN);
+                snprintf(buf, LINE_LEN, "%d Perc", this_data.humidty);
+                break;
             case PRES_INDEX:
-                snprintf(buf, LINE_LEN, "%d", this_data.pressure);
-                strlcat(data_strings[i], buf, LINE_LEN);
+                snprintf(buf, LINE_LEN, "%d Pa", this_data.pressure);
+                break;
         }
-        // Terminate buf.
-        buf[0] = '\0';
-        gl_draw_string(x_start, cur_y, data_strings[i], this_data.c_contents);
-        printf("%s\n", data_strings[i]);
+        line_len = strlen(data_strings[i]);
+        strlcat(data_strings[i], buf, LINE_LEN);
         cur_y += ch_height + LINE_SPACING;
+        gl_draw_string(x_start, cur_y, data_strings[i], this_data.c_contents);
+        data_strings[i][line_len] = '\0';
     }
 }
 
@@ -214,13 +214,14 @@ static void draw_data_test(void) {
 
     dashboard_draw_data(data_today);
 
-    // processed_data_t data_yes;
-    // data_yes.x = 0, data_yes.y = 1;
-    // data_yes.title = "Yesterday";
-    // data_yes.temp = 80, data_yes.soil_mois = 56, data_yes.pressure = 101000;
-    // data_yes.c_contents = GL_BLACK;
+    processed_data_t data_yes;
+    data_yes.x = 0, data_yes.y = 1;
+    data_yes.title = "Yesterday";
+    data_yes.temp = 80, data_yes.soil_mois = 56, data_yes.pressure = 101000;
+    data_yes.humidty = 75;
+    data_yes.c_contents = GL_BLACK;
 
-    // dashboard_draw_data(data_yes);
+    dashboard_draw_data(data_yes);
 }
 
 static void dashboard_test(void) {
