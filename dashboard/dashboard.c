@@ -9,9 +9,14 @@
 #include "assert.h"
 #include "printf.h"
 #include "strings.h"
+#include "printf.h"
 
 #define DATA_SIZE 4
 #define LINE_LEN 40
+#define TEMP_INDEX 0
+#define SOIL_INDEX 1
+#define HUMI_INDEX 2
+#define PRES_INDEX 3
 
 static struct {
     color_t bg_color, fg_color;
@@ -165,7 +170,28 @@ static void dashboard_draw_data(processed_data_t this_data) {
     int cur_y = y_start;
 
     for (int i = 0; i < DATA_SIZE; i++) {
+        // Join the values with the strings
+        char buf[LINE_LEN];
+        buf[0] = '\0';
+        switch (i) {
+            case TEMP_INDEX:
+                snprintf(buf, LINE_LEN, "%d F", this_data.temp);
+                printf("%s\n", buf);
+                strlcat(data_strings[i], buf, LINE_LEN);
+            case SOIL_INDEX:
+                snprintf(buf, LINE_LEN, "%d", this_data.soil_mois);
+                strlcat(data_strings[i], buf, LINE_LEN);
+            case HUMI_INDEX:
+                snprintf(buf, LINE_LEN, "%d", this_data.humidty);
+                strlcat(data_strings[i], buf, LINE_LEN);
+            case PRES_INDEX:
+                snprintf(buf, LINE_LEN, "%d", this_data.pressure);
+                strlcat(data_strings[i], buf, LINE_LEN);
+        }
+        // Terminate buf.
+        buf[0] = '\0';
         gl_draw_string(x_start, cur_y, data_strings[i], this_data.c_contents);
+        printf("%s\n", data_strings[i]);
         cur_y += ch_height + LINE_SPACING;
     }
 }
@@ -182,18 +208,19 @@ static void draw_data_test(void) {
     processed_data_t data_today;
     data_today.x = 0, data_today.y = 0;
     data_today.title = "Today";
-    data_today.temp = 0, data_today.soil_mois = 0, data_today.pressure = 0;
+    data_today.temp = 50, data_today.soil_mois = 45, data_today.pressure = 101325;
+    data_today.humidty = 100;
     data_today.c_contents = GL_BLACK;
 
     dashboard_draw_data(data_today);
 
-    processed_data_t data_yes;
-    data_yes.x = 0, data_yes.y = 1;
-    data_yes.title = "Yesterday";
-    data_yes.temp = 0, data_yes.soil_mois = 0, data_yes.pressure = 0;
-    data_yes.c_contents = GL_BLACK;
+    // processed_data_t data_yes;
+    // data_yes.x = 0, data_yes.y = 1;
+    // data_yes.title = "Yesterday";
+    // data_yes.temp = 80, data_yes.soil_mois = 56, data_yes.pressure = 101000;
+    // data_yes.c_contents = GL_BLACK;
 
-    dashboard_draw_data(data_yes);
+    // dashboard_draw_data(data_yes);
 }
 
 static void dashboard_test(void) {
