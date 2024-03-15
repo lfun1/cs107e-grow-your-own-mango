@@ -27,9 +27,9 @@ static void print_magnet(unsigned int val) {
 
 static unsigned long get_time_detected() {
     while(gpio_read(pin) == 1) {} // wait for low
-    print_magnet(0);
+    //print_magnet(0);
     while(gpio_read(pin) == 0) {} // wait for high
-    print_magnet(1);
+    //print_magnet(1);
     return timer_get_ticks() / TICKS_PER_MSEC;
 }
 
