@@ -19,6 +19,7 @@
 #define PRES_INDEX 3
 #define ADJUST 3
 #define LABEL_SIZE 8
+#define GRAPH_ARRAY_S 5
 
 static struct {
     color_t bg_color, fg_color;
@@ -131,7 +132,8 @@ void dashboard_clear(void) {
 typedef struct {
     int x, y; // index of graph pane
     const char *title;
-    void *data;
+    float raw_data[GRAPH_ARRAY_S];
+    float *proc_data[GRAPH_ARRAY_S];
     int ndata;
     color_t c_axes, c_points;
     char *x_y_label[2];
@@ -205,6 +207,25 @@ static void dashboard_draw_data(processed_data_t this_data) {
     }
 }
 
+static void graph_init(graph_t *graph) {
+    // Get space for labels.
+    (*graph).x_y_label[0] = malloc(LABEL_SIZE); (*graph).x_y_label[0][0] = '\0';
+    (*graph).x_y_label[1] = malloc(LABEL_SIZE); (*graph).x_y_label[1][0] = '\0';
+
+    // Get space for raw data.
+    // (*graph).raw_data = malloc(sizeof(float) * GRAPH_ARRAY_S);
+
+    // Get space for the processed data.
+    for (int i = 0; i < GRAPH_ARRAY_S; i++) {
+        (*graph).proc_data[i] = malloc(sizeof(float) * 3);
+    }
+}
+
+static void put_labels(graph_t *graph, const char *_x, const char *_y) {
+    strlcat((*graph).x_y_label[0], _x, LABEL_SIZE);
+    strlcat((*graph).x_y_label[1], _y, LABEL_SIZE);
+}
+
 static int get_pane_x_min(int x) {
     return module.panes_x[x];
 }
@@ -240,6 +261,26 @@ static void draw_axis_units(graph_t graph) {
     gl_draw_string(hor_x_label, hor_y_label, graph.x_y_label[1], graph.c_points);
 }
 
+static void get_plotting_points(graph_t graph) {
+    int char_width = gl_get_char_width();
+    int x_min = get_pane_x_min(graph.x) + 3 * char_width;
+    int x_max = get_pane_x_max(graph.x);
+    int y_min = get_pane_y_min(graph.y) + module.line_height;
+    int y_max = get_pane_y_max(graph.y) - module.line_height;
+
+    int data_min = ga; int data_max = 0;
+
+    // Get the max and min of the data values.
+    for (int i = 0; i < GRAPH_ARRAY_S; i++) {
+
+    }
+
+    // Origin x_min, y_max
+    int hor_gap = (x_max - x_min) / GRAPH_ARRAY_S;
+
+
+}
+
 static void dashboard_draw_graph(graph_t graph) {
     dashboard_draw_title(graph.x, graph.y, graph.title, graph.c_axes);
     draw_axis_units(graph);
@@ -254,37 +295,31 @@ static void draw_graph_test(void) {
     graph_t temp;
     temp.x = 1, temp.y = 0;
     temp.title = "Temp vs Time";
-    temp.x_y_label[0] = malloc(LABEL_SIZE); temp.x_y_label[0][0] = '\0'; // Terminate the destination
-    strlcat(temp.x_y_label[0], "T/F", LABEL_SIZE);
-    temp.x_y_label[1] = malloc(LABEL_SIZE); temp.x_y_label[1][0] = '\0';
-    strlcat(temp.x_y_label[1], "t/min", LABEL_SIZE);
+    graph_init(&temp);
+    put_labels(&temp, "T/F", "t/min");
     temp.c_axes = GL_BLACK, temp.c_points = GL_RED;
 
     graph_t hum;
     hum.x = 2, hum.y = 0;
     hum.title = "Hum vs Time(Day)";
-    hum.x_y_label[0] = malloc(LABEL_SIZE); hum.x_y_label[0][0] = '\0';
-    strlcat(hum.x_y_label[0], "H/%", LABEL_SIZE);
-    hum.x_y_label[1] = malloc(LABEL_SIZE); hum.x_y_label[1][0] = '\0';
-    strlcat(hum.x_y_label[1], "t/day", LABEL_SIZE);
+    graph_init(&hum);
+    put_labels(&hum, "H/%", "t/day");
     hum.c_axes = GL_BLACK, hum.c_points = GL_RED;
 
     graph_t soil_mois;
     soil_mois.x = 1, soil_mois.y = 1;
     soil_mois.title = "Soil Moisture vs Time(Day)";
-    soil_mois.x_y_label[0] = malloc(LABEL_SIZE); soil_mois.x_y_label[0][0] = '\0';
-    strlcat(soil_mois.x_y_label[0], "M/%", LABEL_SIZE);
-    soil_mois.x_y_label[1] = malloc(LABEL_SIZE); soil_mois.x_y_label[1][0] = '\0';
-    strlcat(soil_mois.x_y_label[1], "t/day", LABEL_SIZE);
+    graph_init(&soil_mois);
+    put_labels(&soil_mois, "M/%", "t/day");
     soil_mois.c_axes = GL_BLACK, soil_mois.c_points = GL_RED;
 
     graph_t wind_speed;
     wind_speed.x = 2, wind_speed.y = 1;
     wind_speed.title = "Wind Speed vs Time";
-    wind_speed.x_y_label[0] = malloc(LABEL_SIZE); wind_speed.x_y_label[0][0] = '\0';
-    strlcat(wind_speed.x_y_label[0], "m/s", LABEL_SIZE);
-    wind_speed.x_y_label[1] = malloc(LABEL_SIZE); wind_speed.x_y_label[1][0] = '\0';
-    strlcat(wind_speed.x_y_label[1], "t/min", LABEL_SIZE);
+    graph_init(&wind_speed);
+    put_labels(&wind_speed, "m/s", "t/min");
+    wind_speed.raw_data[0] = 11.34; wind_speed.raw_data[0] = 15.20; wind_speed.raw_data[0] = 13.45;
+    wind_speed.raw_data[0] = 12.23; wind_speed.raw_data[0] = 16.70;
     wind_speed.c_axes = GL_BLACK, wind_speed.c_points = GL_RED;
 
     dashboard_draw_graph(temp);
@@ -313,25 +348,25 @@ static void draw_data_test(void) {
     dashboard_draw_data(data_yes);
 }
 
-static void dashboard_test(void) {
-    graph_t temp;
-    temp.x = 1, temp.y = 0;
-    temp.title = "Temp vs Time";
-    temp.ndata = 2;
-    temp.data = malloc(2 * temp.ndata * sizeof(int));
-    int (*data)[2] = temp.data;
-    /* data[0] = {4, 20}; */
-    /* data[1] = {6, 23}; */
-    data[0][0] = 4;
-    data[0][1] = 20;
-    data[1][0] = 6;
-    data[1][1] = 23;
+// static void dashboard_test(void) {
+//     graph_t temp;
+//     temp.x = 1, temp.y = 0;
+//     temp.title = "Temp vs Time";
+//     temp.ndata = 2;
+//     temp.data = malloc(2 * temp.ndata * sizeof(int));
+//     int (*data)[2] = temp.data;
+//     /* data[0] = {4, 20}; */
+//     /* data[1] = {6, 23}; */
+//     data[0][0] = 4;
+//     data[0][1] = 20;
+//     data[1][0] = 6;
+//     data[1][1] = 23;
     
-    temp.c_axes = GL_BLACK, temp.c_points = GL_RED;
+//     temp.c_axes = GL_BLACK, temp.c_points = GL_RED;
 
-    dashboard_draw_graph(temp);
-    draw_axis_units(temp);
-}
+//     dashboard_draw_graph(temp);
+//     draw_axis_units(temp);
+// }
 
 
 void dashboard_show(void) {
