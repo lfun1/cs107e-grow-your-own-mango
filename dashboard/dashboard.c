@@ -22,7 +22,7 @@
 #define GRAPH_ARRAY_S 5
 
 static struct {
-    color_t bg_color, fg_color;
+    color_t bg_color, fg_color, line_color;
     int line_height;
     int nrows, ncols;
     int edge_gap, interior_gap;
@@ -48,6 +48,7 @@ void dashboard_init(int nrows, int ncols, color_t foreground, color_t background
     module.line_height = gl_get_char_height() + LINE_SPACING;
     module.fg_color = foreground;
     module.bg_color = background;
+    module.line_color = GL_PURPLE;
 
     // Deallocate previous contents memory
     //if (module.contents) free(module.contents);
@@ -133,7 +134,7 @@ typedef struct {
     int x, y; // index of graph pane
     const char *title;
     float raw_data[GRAPH_ARRAY_S];
-    float *proc_data[GRAPH_ARRAY_S];
+    int *proc_data[GRAPH_ARRAY_S];
     int ndata;
     color_t c_axes, c_points;
     char *x_y_label[2];
@@ -217,7 +218,7 @@ static void graph_init(graph_t *graph) {
 
     // Get space for the processed data.
     for (int i = 0; i < GRAPH_ARRAY_S; i++) {
-        (*graph).proc_data[i] = malloc(sizeof(float) * 3);
+        (*graph).proc_data[i] = malloc(sizeof(int) * 3);
     }
 }
 
@@ -268,22 +269,48 @@ static void get_plotting_points(graph_t graph) {
     int y_min = get_pane_y_min(graph.y) + module.line_height;
     int y_max = get_pane_y_max(graph.y) - module.line_height;
 
-    int data_min = ga; int data_max = 0;
+    float data_min = graph.raw_data[0]; float data_max = graph.raw_data[0];
 
     // Get the max and min of the data values.
-    for (int i = 0; i < GRAPH_ARRAY_S; i++) {
-
+    for (int i = 1; i < GRAPH_ARRAY_S; i++) {
+        if (graph.raw_data[i] < data_min) data_min = graph.raw_data[i];
+        if (graph.raw_data[i] > data_max) data_max = graph.raw_data[i];
     }
-
-    // Origin x_min, y_max
+    printf("max data: %d min data: %d\n", (int)data_max, (int)data_min);
+    int data_gap = data_max - data_min;
     int hor_gap = (x_max - x_min) / GRAPH_ARRAY_S;
+    int graph_height = (y_max - y_min) / 2;
+    int cur_y = y_min + graph_height;
+    int cur_x = x_min;
 
+    // The first data point always takes the middle part.
+    graph.proc_data[0][0] = cur_x;
+    graph.proc_data[0][1] = cur_y;
 
+    printf("Data gap: %d", data_gap);
+
+    for (int j = 1; j < GRAPH_ARRAY_S; j++) {
+        cur_y -= (int)(((graph.raw_data[j] - graph.raw_data[j - 1]) / data_gap) * graph_height);
+        cur_x += hor_gap;
+        graph.proc_data[j][0] = cur_x;
+        graph.proc_data[j][1] = cur_y;
+    }
+}
+
+static void plot_points(graph_t graph) {
+    for (int i = 0; i < GRAPH_ARRAY_S - 1; i++) {
+        gl_draw_line(graph.proc_data[i][0], graph.proc_data[i][1], graph.proc_data[i + 1][0], graph.proc_data[i + 1][1], module.line_color);
+    }
+    // gl_draw_line(graph.proc_data[0][0], graph.proc_data[0][1], graph.proc_data[1][0], graph.proc_data[1][1], graph.c_points);
+    // gl_draw_line(graph.proc_data[1][0], graph.proc_data[1][1], graph.proc_data[2][0], graph.proc_data[2][1], graph.c_points);
+    // gl_draw_line(graph.proc_data[2][0], graph.proc_data[2][1], graph.proc_data[3][0], graph.proc_data[3][1], graph.c_points);
+    // gl_draw_line(graph.proc_data[3][0], graph.proc_data[3][1], graph.proc_data[4][0], graph.proc_data[4][1], graph.c_points);
 }
 
 static void dashboard_draw_graph(graph_t graph) {
     dashboard_draw_title(graph.x, graph.y, graph.title, graph.c_axes);
     draw_axis_units(graph);
+
 
     // for (int i = 0; i < 4; i++) {
     //     printf("%d\n", ((int *)graph.data)[i]);
@@ -297,6 +324,10 @@ static void draw_graph_test(void) {
     temp.title = "Temp vs Time";
     graph_init(&temp);
     put_labels(&temp, "T/F", "t/min");
+    temp.raw_data[0] = 61; temp.raw_data[1] = 65; temp.raw_data[2] = 59;
+    temp.raw_data[3] = 56; temp.raw_data[4] = 68;
+    get_plotting_points(temp);
+    plot_points(temp);
     temp.c_axes = GL_BLACK, temp.c_points = GL_RED;
 
     graph_t hum;
@@ -304,6 +335,10 @@ static void draw_graph_test(void) {
     hum.title = "Hum vs Time(Day)";
     graph_init(&hum);
     put_labels(&hum, "H/%", "t/day");
+    hum.raw_data[0] = 80; hum.raw_data[1] = 100; hum.raw_data[2] = 40;
+    hum.raw_data[3] = 60; hum.raw_data[4] = 50;
+    get_plotting_points(hum);
+    plot_points(hum);
     hum.c_axes = GL_BLACK, hum.c_points = GL_RED;
 
     graph_t soil_mois;
@@ -311,6 +346,10 @@ static void draw_graph_test(void) {
     soil_mois.title = "Soil Moisture vs Time(Day)";
     graph_init(&soil_mois);
     put_labels(&soil_mois, "M/%", "t/day");
+    soil_mois.raw_data[0] = 100; soil_mois.raw_data[1] = 56; soil_mois.raw_data[2] = 70;
+    soil_mois.raw_data[3] = 60; soil_mois.raw_data[4] = 100;
+    get_plotting_points(soil_mois);
+    plot_points(soil_mois);
     soil_mois.c_axes = GL_BLACK, soil_mois.c_points = GL_RED;
 
     graph_t wind_speed;
@@ -318,8 +357,10 @@ static void draw_graph_test(void) {
     wind_speed.title = "Wind Speed vs Time";
     graph_init(&wind_speed);
     put_labels(&wind_speed, "m/s", "t/min");
-    wind_speed.raw_data[0] = 11.34; wind_speed.raw_data[0] = 15.20; wind_speed.raw_data[0] = 13.45;
-    wind_speed.raw_data[0] = 12.23; wind_speed.raw_data[0] = 16.70;
+    wind_speed.raw_data[0] = 11.34; wind_speed.raw_data[1] = 5.20; wind_speed.raw_data[2] = 13.45;
+    wind_speed.raw_data[3] = 12.23; wind_speed.raw_data[4] = 16.70;
+    get_plotting_points(wind_speed);
+    plot_points(wind_speed);
     wind_speed.c_axes = GL_BLACK, wind_speed.c_points = GL_RED;
 
     dashboard_draw_graph(temp);
