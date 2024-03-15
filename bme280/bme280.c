@@ -9,6 +9,7 @@
  */
 
 #include "bme280.h"
+#include "spi.h"
 #include "timer.h"
 #include "printf.h"
 
@@ -57,6 +58,8 @@ bool bme_init(void) {
                 STANDBY_MS_1000);
 
     timer_delay_ms(100);
+
+    spi_init();
 
     return true;
 }
