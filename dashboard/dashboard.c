@@ -17,6 +17,8 @@
 #define SOIL_INDEX 1
 #define HUMI_INDEX 2
 #define PRES_INDEX 3
+#define ADJUST 3
+#define LABEL_SIZE 8
 
 static struct {
     color_t bg_color, fg_color;
@@ -132,6 +134,7 @@ typedef struct {
     void *data;
     int ndata;
     color_t c_axes, c_points;
+    char *x_y_label[2];
 } graph_t;
 
 typedef struct {
@@ -183,11 +186,11 @@ static void dashboard_draw_data(processed_data_t this_data) {
                 break;
             case SOIL_INDEX:
                 num_dec = (int)this_data.soil_mois;
-                snprintf(buf, LINE_LEN, "%d.%02d Perc", (int)this_data.soil_mois, (int)((this_data.soil_mois - num_dec) * 100));
+                snprintf(buf, LINE_LEN, "%d.%02d %%", (int)this_data.soil_mois, (int)((this_data.soil_mois - num_dec) * 100));
                 break;
             case HUMI_INDEX:
                 num_dec = (int)this_data.humidty;
-                snprintf(buf, LINE_LEN, "%d.%02d Perc", (int)this_data.humidty, (int)((this_data.humidty - num_dec) * 100));
+                snprintf(buf, LINE_LEN, "%d.%02d %%", (int)this_data.humidty, (int)((this_data.humidty - num_dec) * 100));
                 break;
             case PRES_INDEX:
                 num_dec = (int)this_data.pressure;
@@ -202,12 +205,92 @@ static void dashboard_draw_data(processed_data_t this_data) {
     }
 }
 
+static int get_pane_x_min(int x) {
+    return module.panes_x[x];
+}
+
+static int get_pane_y_min(int y) {
+    return module.panes_y[y];
+}
+
+static int get_pane_x_max(int x) {
+    return get_pane_x_min(x) + module.pane_width ;
+}
+
+static int get_pane_y_max(int x) {
+    return get_pane_y_min(x) + module.pane_height;
+}
+
+static void draw_axis_units(graph_t graph) {
+    int char_width = gl_get_char_width();
+    int x_min = get_pane_x_min(graph.x) + 3 * char_width; // Draw after a space of 2 characters.
+    int x_max = get_pane_x_max(graph.x);
+    int y_min = get_pane_y_min(graph.y) + module.line_height; // Draw after 1 line(s).
+    int y_max = get_pane_y_max(graph.y) - module.line_height; // Leave one space after drawing.
+
+    gl_draw_line(x_min, y_min, x_min, y_max, graph.c_axes);
+    gl_draw_line(x_min, y_max, x_max, y_max, graph.c_axes);
+
+    int vert_x_label = get_pane_x_min(graph.x);
+    int vert_y_label = (y_min + y_max) / 2;
+    int hor_x_label = (x_max + x_min) / 2;
+    int hor_y_label = get_pane_y_max(graph.y) - module.line_height + LINE_SPACING;
+
+    gl_draw_string(vert_x_label, vert_y_label, graph.x_y_label[0], graph.c_points);
+    gl_draw_string(hor_x_label, hor_y_label, graph.x_y_label[1], graph.c_points);
+}
+
 static void dashboard_draw_graph(graph_t graph) {
     dashboard_draw_title(graph.x, graph.y, graph.title, graph.c_axes);
-    
-    for (int i = 0; i < 4; i++) {
-        printf("%d\n", ((int *)graph.data)[i]);
-    }
+    draw_axis_units(graph);
+
+    // for (int i = 0; i < 4; i++) {
+    //     printf("%d\n", ((int *)graph.data)[i]);
+    // }
+    // int (*graph.data)[2]
+}
+
+static void draw_graph_test(void) {
+    graph_t temp;
+    temp.x = 1, temp.y = 0;
+    temp.title = "Temp vs Time";
+    temp.x_y_label[0] = malloc(LABEL_SIZE); temp.x_y_label[0][0] = '\0'; // Terminate the destination
+    strlcat(temp.x_y_label[0], "T/F", LABEL_SIZE);
+    temp.x_y_label[1] = malloc(LABEL_SIZE); temp.x_y_label[1][0] = '\0';
+    strlcat(temp.x_y_label[1], "t/min", LABEL_SIZE);
+    temp.c_axes = GL_BLACK, temp.c_points = GL_RED;
+
+    graph_t hum;
+    hum.x = 2, hum.y = 0;
+    hum.title = "Hum vs Time(Day)";
+    hum.x_y_label[0] = malloc(LABEL_SIZE); hum.x_y_label[0][0] = '\0';
+    strlcat(hum.x_y_label[0], "H/%", LABEL_SIZE);
+    hum.x_y_label[1] = malloc(LABEL_SIZE); hum.x_y_label[1][0] = '\0';
+    strlcat(hum.x_y_label[1], "t/day", LABEL_SIZE);
+    hum.c_axes = GL_BLACK, hum.c_points = GL_RED;
+
+    graph_t soil_mois;
+    soil_mois.x = 1, soil_mois.y = 1;
+    soil_mois.title = "Soil Moisture vs Time(Day)";
+    soil_mois.x_y_label[0] = malloc(LABEL_SIZE); soil_mois.x_y_label[0][0] = '\0';
+    strlcat(soil_mois.x_y_label[0], "M/%", LABEL_SIZE);
+    soil_mois.x_y_label[1] = malloc(LABEL_SIZE); soil_mois.x_y_label[1][0] = '\0';
+    strlcat(soil_mois.x_y_label[1], "t/day", LABEL_SIZE);
+    soil_mois.c_axes = GL_BLACK, soil_mois.c_points = GL_RED;
+
+    graph_t wind_speed;
+    wind_speed.x = 2, wind_speed.y = 1;
+    wind_speed.title = "Wind Speed vs Time";
+    wind_speed.x_y_label[0] = malloc(LABEL_SIZE); wind_speed.x_y_label[0][0] = '\0';
+    strlcat(wind_speed.x_y_label[0], "m/s", LABEL_SIZE);
+    wind_speed.x_y_label[1] = malloc(LABEL_SIZE); wind_speed.x_y_label[1][0] = '\0';
+    strlcat(wind_speed.x_y_label[1], "t/min", LABEL_SIZE);
+    wind_speed.c_axes = GL_BLACK, wind_speed.c_points = GL_RED;
+
+    dashboard_draw_graph(temp);
+    dashboard_draw_graph(hum);
+    dashboard_draw_graph(soil_mois);
+    dashboard_draw_graph(wind_speed);
 }
 
 static void draw_data_test(void) {
@@ -247,11 +330,13 @@ static void dashboard_test(void) {
     temp.c_axes = GL_BLACK, temp.c_points = GL_RED;
 
     dashboard_draw_graph(temp);
+    draw_axis_units(temp);
 }
 
 
 void dashboard_show(void) {
-    dashboard_test();
+    // dashboard_test();
+    draw_graph_test();
     draw_data_test();
     gl_swap_buffer();
 }
