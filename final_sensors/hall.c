@@ -1,11 +1,10 @@
 /* Hall sensor implementation */
 
 #include "hall.h"
-
+#include "timer.h"
 #include "gpio_extra.h"
 #include "uart.h"
 #include "printf.h"
-#include "timer.h"
 
 #define TICKS_PER_MSEC (TICKS_PER_USEC * 1000)
 #define PI 3.1416
