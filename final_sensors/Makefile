@@ -1,7 +1,7 @@
 # Builds example program against libmymango
 
 PROGRAM = main.bin
-SOURCES = $(PROGRAM:.bin=.c) spi.c mcp3008.c hall.c
+SOURCES = $(PROGRAM:.bin=.c) spi.c mcp3008.c hall.c bme280.c soil_moisture.c
 
 # Add source files in SOURCES.
 # Using Lisa's mylibmango.a
