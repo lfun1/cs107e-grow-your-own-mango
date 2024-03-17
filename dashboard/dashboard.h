@@ -37,4 +37,6 @@ void change_data(void);
 
 void print_all_graphs(void);
 
+void data_graph_init(void);
+
 #endif

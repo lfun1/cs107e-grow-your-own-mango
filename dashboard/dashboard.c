@@ -276,19 +276,19 @@ static void draw_axis_units(graph_t graph) {
     gl_draw_string(hor_x_label, hor_y_label, graph.x_y_label[1], graph.c_points);
 }
 
-static void get_plotting_points(graph_t graph) {
+static void get_plotting_points(graph_t *graph) {
     int char_width = gl_get_char_width();
-    int x_min = get_pane_x_min(graph.x) + 3 * char_width;
-    int x_max = get_pane_x_max(graph.x);
-    int y_min = get_pane_y_min(graph.y) + module.line_height;
-    int y_max = get_pane_y_max(graph.y) - module.line_height;
+    int x_min = get_pane_x_min(graph->x) + 3 * char_width;
+    int x_max = get_pane_x_max(graph->x);
+    int y_min = get_pane_y_min(graph->y) + module.line_height;
+    int y_max = get_pane_y_max(graph->y) - module.line_height;
 
-    float data_min = graph.raw_data[0]; float data_max = graph.raw_data[0];
+    float data_min = graph->raw_data[0]; float data_max = graph->raw_data[0];
 
     // Get the max and min of the data values.
     for (int i = 1; i < GRAPH_ARRAY_S; i++) {
-        if (graph.raw_data[i] < data_min) data_min = graph.raw_data[i];
-        if (graph.raw_data[i] > data_max) data_max = graph.raw_data[i];
+        if (graph->raw_data[i] < data_min) data_min = graph->raw_data[i];
+        if (graph->raw_data[i] > data_max) data_max = graph->raw_data[i];
     }
 
     int data_gap = data_max - data_min;
@@ -298,37 +298,41 @@ static void get_plotting_points(graph_t graph) {
     int cur_x = x_min;
 
     // The first data point always takes the middle part.
-    graph.proc_data[0][0] = cur_x;
-    graph.proc_data[0][1] = cur_y;
+    graph->proc_data[0][0] = cur_x;
+    graph->proc_data[0][1] = cur_y;
 
     for (int j = 1; j < GRAPH_ARRAY_S; j++) {
-        cur_y -= (int)(((graph.raw_data[j] - graph.raw_data[j - 1]) / data_gap) * graph_height);
+        cur_y -= (int)(((graph->raw_data[j] - graph->raw_data[j - 1]) / data_gap) * graph_height);
         cur_x += hor_gap;
-        graph.proc_data[j][0] = cur_x;
-        graph.proc_data[j][1] = cur_y;
+        graph->proc_data[j][0] = cur_x;
+        graph->proc_data[j][1] = cur_y;
     }
 }
 
-static void plot_points(graph_t graph) {
+static void plot_points(graph_t *graph) {
     for (int i = 0; i < GRAPH_ARRAY_S - 1; i++) {
-        gl_draw_line(graph.proc_data[i][0], graph.proc_data[i][1], graph.proc_data[i + 1][0], graph.proc_data[i + 1][1], module.line_color);
+        gl_draw_line(graph->proc_data[i][0], graph->proc_data[i][1], graph->proc_data[i + 1][0], graph->proc_data[i + 1][1], module.line_color);
     }
 }
 
-static void dashboard_draw_graph(graph_t graph) {
-    dashboard_draw_title(graph.x, graph.y, graph.title, graph.c_axes);
-    draw_axis_units(graph);
+static void dashboard_draw_graph(graph_t *graph) {
+    dashboard_draw_title(graph->x, graph->y, graph->title, graph->c_axes);
+    draw_axis_units(*graph);
 }
 
 static void add_another_value(graph_t *graph) {
-    int *starter = (*graph).proc_data[0];
+    // printf("Unprocessed before at index 0: %d and at index 4: %d\n", (int)(graph->raw_data[0]), (int)(graph->raw_data[1]));
+    int start = graph->raw_data[0];
     for (int i = 0; i < GRAPH_ARRAY_S - 1; i++) {
-        (*graph).proc_data[i] = (*graph).proc_data[i + 1];
+        graph->raw_data[i] = graph->raw_data[i + 1];
     }
-    (*graph).proc_data[GRAPH_ARRAY_S - 1] = starter;
+    graph->raw_data[GRAPH_ARRAY_S - 1] = start;
+    // printf("Data value at position for %s _x: %d _y: %d\n", graph->title, graph->proc_data[0][0], graph->proc_data[0][1]);
+    // printf("Unprocessed data at index 0: %d and at index 4: %d\n", (int)(graph->raw_data[0]), (int)(graph->raw_data[1]));
+    // int *starter = (*graph).proc_data[0];
 }
 
-static void data_graph_init(void) {
+void data_graph_init(void) {
     graph_init(&temp, 1, 0);
     put_labels(&temp, "T/F", "t/min", "Temp vs Time");
     temp.raw_data[0] = 61; temp.raw_data[1] = 65; temp.raw_data[2] = 59;
@@ -368,27 +372,21 @@ static void data_graph_init(void) {
     data_yes.c_contents = GL_BLACK;
 }
 
-static void graph_run(graph_t graph) {
+static void graph_run(graph_t *graph) {
     get_plotting_points(graph);
     plot_points(graph);
     dashboard_draw_graph(graph);
-    add_another_value(&graph);
+    add_another_value(graph);
 }
 
 void dashboard_show(void) {
-    data_graph_init();
-    graph_run(temp); graph_run(soil_mois); graph_run(hum); graph_run(wind_speed);
+    graph_run(&temp); graph_run(&soil_mois); graph_run(&hum); graph_run(&wind_speed);
     dashboard_draw_data(data_yes); dashboard_draw_data(data_today);
     gl_swap_buffer();
 }
 
-void change_data(void) {
-    graph_run(temp); graph_run(soil_mois); graph_run(hum); graph_run(wind_speed);
-    gl_swap_buffer();
-}
-
 void print_all_graphs(void) {
-    for (int i = 1; i < GRAPH_ARRAY_S; i++) {
+    for (int i = 0; i < GRAPH_ARRAY_S; i++) {
         printf("index: %d , _x: %d , _y: %d ", i, temp.proc_data[i][0], temp.proc_data[i][1]);
     }
     printf("\n");

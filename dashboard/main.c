@@ -5,6 +5,7 @@
 #include "printf.h"
 #include "uart.h"
 #include "dashboard.h"
+#include "timer.h"
 
 extern unsigned long config_float(void);
 
@@ -24,19 +25,12 @@ void main(void) {
 
     // Test dashboard
     dashboard_init(2,3,GL_SILVER, GL_MOSS);
-    pause("Dashboard initialized");
-    dashboard_draw_outline();
-    dashboard_show();
-    printf("Data before changae\n");
-    print_all_graphs();
-    dashboard_draw_outline();
-    dashboard_show();
-    pause("Showing dashboard outlines: Click to use change data values");
-    printf("Data after changae\n");
-    print_all_graphs();
-    pause("Show next");
-    // while (1) {
-    //     change_data();
-    //     pause("Go to next");
-    // }
+    data_graph_init();
+    
+
+    while (1) {
+        dashboard_show();
+        dashboard_draw_outline();
+        timer_delay(1);
+    }
 }
