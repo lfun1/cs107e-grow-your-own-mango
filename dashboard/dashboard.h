@@ -1,6 +1,5 @@
 #ifndef DASHBOARD_H
 #define DASHBOARD_H
-
 /* 
  * Module to display dashboard with sensor data and graphs.
  *
@@ -33,5 +32,9 @@ void dashboard_clear(void);
 void dashboard_draw_outline(void);
 
 void dashboard_show(void);
+
+void change_data(void);
+
+void print_all_graphs(void);
 
 #endif
