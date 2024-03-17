@@ -26,11 +26,19 @@ void main(void) {
     // Test dashboard
     dashboard_init(2,3,GL_SILVER, GL_MOSS);
     data_graph_init();
+    dashboard_draw_outline();
+    dashboard_show(70, 70, 50, 20);
+    pause("Go to next");
     
+    float d_temp, d_hum, d_soil_mois, d_wind_speed;
+    d_temp = 90.0;
+    d_hum = 60.0;
+    d_soil_mois = 10.0;
+    d_wind_speed = 10.0;
 
     while (1) {
-        dashboard_show();
         dashboard_draw_outline();
-        timer_delay(1);
+        dashboard_show(d_temp, d_hum, d_soil_mois, d_wind_speed);
+        pause("Go to next");
     }
 }

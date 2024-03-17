@@ -31,7 +31,7 @@ void dashboard_clear(void);
 
 void dashboard_draw_outline(void);
 
-void dashboard_show(void);
+void dashboard_show(float d_temp, float d_hum, float d_soil_mois, float d_wind_speed);
 
 void change_data(void);
 
