@@ -31,6 +31,9 @@ static bool isReadingCalibration(void);
 /* BME280 init */
 
 bool bme_init(void) {
+    spi_init();
+    timer_delay_ms(10);
+    
     _sensorID = read8(BME280_REGISTER_CHIPID);
 
     if (_sensorID != 0x60)
@@ -58,8 +61,6 @@ bool bme_init(void) {
                 STANDBY_MS_1000);
 
     timer_delay_ms(100);
-
-    spi_init();
 
     return true;
 }

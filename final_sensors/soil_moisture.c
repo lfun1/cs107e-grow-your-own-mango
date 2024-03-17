@@ -5,6 +5,7 @@
 #include "gpio.h"
 #include "uart.h"
 #include "printf.h"
+#include "mcp3008.h"
 
 static unsigned int mcp_channel;
 
