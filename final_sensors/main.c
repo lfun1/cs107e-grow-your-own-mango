@@ -34,9 +34,19 @@ static void test_hall(void) {
     }
 }
 
+static void test_soil_moisture(void) {
+    soil_moisture_init(0);
+    
+    while (1) {
+        printf("Soil moisture: %d%%\n", soil_moisture_read());
+        timer_delay(1);
+    }
+}
+
 void main(void)  {
     uart_init();
     uart_putstring("Starting main in final_sensors\n");
 
-    test_bme280();    
+    //test_bme280();
+    test_soil_moisture();
 }

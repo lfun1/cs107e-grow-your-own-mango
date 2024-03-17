@@ -20,8 +20,8 @@ int soil_moisture_read(void) {
     static const int DRY = 860, WATER = 400;
     
     int moisture = mcp3008_read(mcp_channel);
-    printf("Soil Moisture value read: %4d\n", moisture);
+    //printf("Soil Moisture value read: %04d\n", moisture);
     int moisture_percent = 100 * (DRY - moisture) / (DRY - WATER);
-    printf("Moisture: %2d%%\n", moisture_percent);
+    //printf("Moisture: %02d%%\n", moisture_percent);
     return moisture_percent;
 }
