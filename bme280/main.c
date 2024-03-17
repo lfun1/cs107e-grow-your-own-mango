@@ -80,20 +80,15 @@ static void test_bme280_config(void) {
 
     bme_init();
 
-    printf("Expect -1 for all\n");
-    printf("Temperature read: %d\n", (int)(readTemperature()*100));
+    while (1) {
+        printf("Temperature read: %d\n", (int)(readTemperature()*100));
 
-    printf("Pressure read: %d\n", (int)(readPressure()));
+        printf("Pressure read: %d\n", (int)(readPressure()));
 
-    printf("Humidity read: %d\n", (int)(readHumidity()));
-    timer_delay(1);
-
-    //printf("return val: %x\n", takeForcedMeasurement());
-    printf("Temperature read: %d\n", (int)(readTemperature()*100));
-
-    printf("Pressure read: %d\n", (int)(readPressure()));
-
-    printf("Humidity read: %d\n", (int)(readHumidity()));
+        printf("Humidity read: %d\n", (int)(readHumidity()));
+        timer_delay(1);
+    }
+    
     
     //print_bme280_reg();
     
