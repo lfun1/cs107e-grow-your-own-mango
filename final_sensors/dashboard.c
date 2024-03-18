@@ -280,10 +280,14 @@ static void draw_axis_units(graph_t graph) {
         gl_draw_string(vert_x_label, y_min, "5", GL_MAGENTA);
         gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "0", GL_MAGENTA);
         
-    } else if (strcmp(hum.title, graph.title) == 0 || strcmp(temp.title, graph.title) == 0) {
+    } else if (strcmp(hum.title, graph.title) == 0) {
         gl_draw_string(vert_x_label, y_min, "100", GL_MAGENTA);
         gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "40", GL_MAGENTA);
-    } else {
+    } else if (strcmp(temp.title, graph.title) == 0) {
+        gl_draw_string(vert_x_label, y_min, "80", GL_MAGENTA);
+        gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "50", GL_MAGENTA);
+    }
+     else {
         gl_draw_string(vert_x_label, y_min, "100", GL_MAGENTA);
         gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "0", GL_MAGENTA);
     }
@@ -296,21 +300,18 @@ static void get_plotting_points(graph_t *graph) {
     int y_min = get_pane_y_min(graph->y) + module.line_height;
     int y_max = get_pane_y_max(graph->y) - module.line_height;
 
-    float data_min = graph->raw_data[0]; float data_max = graph->raw_data[0];
+    // float data_min = graph->raw_data[0]; float data_max = graph->raw_data[0];
 
-    // Get the max and min of the data values.
-    for (int i = 1; i < GRAPH_ARRAY_S; i++) {
-        if (graph->raw_data[i] < data_min) data_min = graph->raw_data[i];
-        if (graph->raw_data[i] > data_max) data_max = graph->raw_data[i];
-    }
-
-    int data_gap = data_max - data_min;
+    // // Get the max and min of the data values.
+    // for (int i = 1; i < GRAPH_ARRAY_S; i++) {
+    //     if (graph->raw_data[i] < data_min) data_min = graph->raw_data[i];
+    //     if (graph->raw_data[i] > data_max) data_max = graph->raw_data[i];
+    // }
+    
     int hor_gap = (x_max - x_min) / GRAPH_ARRAY_S;
     int graph_height = (y_max - y_min) / 2;
     int cur_y = y_max;
     int cur_x = x_min;
-
-    int average = (graph->max_val + graph->min_val) / 2;
 
     for (int j = 0; j < GRAPH_ARRAY_S; j++) {
         cur_y = y_max - (((graph->raw_data[j] - graph->min_val) / (graph->max_val - graph->min_val)) * (graph_height * 2));
@@ -339,18 +340,23 @@ static void add_another_value(graph_t *graph, float data) {
 }
 
 void data_graph_init(void) {
+    float initial_temp = 70; float temp_max = 80;
+    float initial_hum = 70; float temp_min = 50;
+    float initial_soil_mois = 50;
+    float initial_wind_speed = 2.5;
+
     graph_init(&temp, 1, 0);
     put_labels(&temp, "T/F", "t/min", "Temp vs Time");
-    temp.raw_data[0] = 70; temp.raw_data[1] = 70; temp.raw_data[2] = 70;
-    temp.raw_data[3] = 70; temp.raw_data[4] = 70;
+    temp.raw_data[0] = initial_temp; temp.raw_data[1] = initial_temp; temp.raw_data[2] = initial_temp;
+    temp.raw_data[3] = initial_temp; temp.raw_data[4] = initial_temp;
     temp.c_axes = GL_BLACK, temp.c_points = GL_RED;
-    temp.max_val = 100;
-    temp.min_val = 40;
+    temp.max_val = temp_max;
+    temp.min_val = temp_min;
 
     graph_init(&hum, 2, 0);
     put_labels(&hum, "H/%", "t/day", "Hum vs Time(Day)");
-    hum.raw_data[0] = 70; hum.raw_data[1] = 70; hum.raw_data[2] = 70;
-    hum.raw_data[3] = 70; hum.raw_data[4] = 70;
+    hum.raw_data[0] = initial_hum; hum.raw_data[1] = 70; hum.raw_data[2] = initial_hum;
+    hum.raw_data[3] = initial_hum; hum.raw_data[4] = initial_hum;
     hum.c_axes = GL_BLACK, hum.c_points = GL_RED;
     hum.max_val = 100;
     hum.min_val = 40;
@@ -358,16 +364,17 @@ void data_graph_init(void) {
     
     graph_init(&soil_mois, 1, 1);
     put_labels(&soil_mois, "M/%", "t/day", "Soil Moisture vs Time(Day)");
-    soil_mois.raw_data[0] = 50; soil_mois.raw_data[1] = 50; soil_mois.raw_data[2] = 50;
-    soil_mois.raw_data[3] = 50; soil_mois.raw_data[4] = 50;
+    soil_mois.raw_data[0] = initial_soil_mois; soil_mois.raw_data[1] = initial_soil_mois; soil_mois.raw_data[2] = initial_soil_mois;
+    soil_mois.raw_data[3] = initial_soil_mois; soil_mois.raw_data[4] = initial_soil_mois;
     soil_mois.c_axes = GL_BLACK, soil_mois.c_points = GL_RED;
     soil_mois.max_val = 100;
     soil_mois.min_val = 0;
 
     graph_init(&wind_speed, 2, 1);
     put_labels(&wind_speed, "m/s", "t/min", "Wind Speed vs Time");
-    wind_speed.raw_data[0] = 2.5; wind_speed.raw_data[1] = 2.5; wind_speed.raw_data[2] = 2.5;
-    wind_speed.raw_data[3] = 2.5; wind_speed.raw_data[4] = 2.5;
+    wind_speed.raw_data[0] = initial_wind_speed; wind_speed.raw_data[1] = initial_wind_speed;
+    wind_speed.raw_data[2] = initial_wind_speed;
+    wind_speed.raw_data[3] = initial_wind_speed; wind_speed.raw_data[4] = initial_wind_speed;
     wind_speed.c_axes = GL_BLACK, wind_speed.c_points = GL_RED;
     wind_speed.max_val = 5;
     wind_speed.min_val = 0;
