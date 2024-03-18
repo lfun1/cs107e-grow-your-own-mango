@@ -44,6 +44,11 @@ void main(void) {
     bme_init();
     soil_moisture_init(0);
     hall_init(GPIO_PB3);
+
+    // Init transistor switch for soil moisture chip select
+    gpio_init();
+    gpio_set_output(GPIO_MCP);
+    gpio_write(GPIO_MCP, 0);
     
     float d_temp, d_hum, d_soil_mois, d_wind_speed;
 
