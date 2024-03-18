@@ -227,10 +227,7 @@ static void graph_init(graph_t *graph, int x, int y) {
     // Get space for labels.
     (*graph).x_y_label[0] = malloc(LABEL_SIZE); (*graph).x_y_label[0][0] = '\0';
     (*graph).x_y_label[1] = malloc(LABEL_SIZE); (*graph).x_y_label[1][0] = '\0';
-
-    // Get space for raw data.
-    // (*graph).raw_data = malloc(sizeof(float) * GRAPH_ARRAY_S);
-
+    
     // Get space for the processed data.
     for (int i = 0; i < GRAPH_ARRAY_S; i++) {
         (*graph).proc_data[i] = malloc(sizeof(int) * 3);
@@ -280,7 +277,7 @@ static void draw_axis_units(graph_t graph) {
     gl_draw_string(vert_x_label, y_max, "min", GL_MAGENTA);
     
     if (strcmp(wind_speed.title, graph.title) == 0) {
-        gl_draw_string(vert_x_label, y_min, "40", GL_MAGENTA);
+        gl_draw_string(vert_x_label, y_min, "4", GL_MAGENTA);
         gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "0", GL_MAGENTA);
         
     } else if (strcmp(hum.title, graph.title) == 0 || strcmp(temp.title, graph.title) == 0) {
@@ -313,31 +310,10 @@ static void get_plotting_points(graph_t *graph) {
     int cur_y = y_max;
     int cur_x = x_min;
 
-    // The first data point always takes the middle part.
-    // graph->proc_data[0][0] = cur_x;
-    // graph->proc_data[0][1] = cur_y;
-
-    // Average
     int average = (graph->max_val + graph->min_val) / 2;
 
     for (int j = 0; j < GRAPH_ARRAY_S; j++) {
         cur_y = y_max - (((graph->raw_data[j] - graph->min_val) / (graph->max_val - graph->min_val)) * (graph_height * 2));
-        // if (data_gap <= 0) {
-        //     if (data_max > average) {
-        //         cur_y = (y_min + graph_height) - (data_max / (int)(graph->max_val - graph->min_val)) * graph_height;
-        //     } else {
-        //         cur_y = (y_min + graph_height) + (data_max / (int)(graph->max_val - graph->min_val)) * graph_height;
-        //     }
-        // } else {
-        //     cur_y -= (int)(((graph->raw_data[j] - graph->raw_data[j - 1]) / data_gap) * graph_height);
-        //     if (cur_y < y_min) {
-        //         cur_y = y_min + module.line_height;
-        //     } else if (cur_y > y_max) {
-        //         cur_y = y_max - module.line_height;
-        //     }
-        // }
-        printf("%s cur_y %d\n", graph->title, cur_y);
-        // printf("y_max %d\n", y_max);
         graph->proc_data[j][0] = cur_x;
         graph->proc_data[j][1] = cur_y;
         cur_x += hor_gap;
@@ -356,15 +332,10 @@ static void dashboard_draw_graph(graph_t *graph) {
 }
 
 static void add_another_value(graph_t *graph, float data) {
-    // printf("Unprocessed before at index 0: %d and at index 4: %d\n", (int)(graph->raw_data[0]), (int)(graph->raw_data[1]));
-    // int start = graph->raw_data[0]; // for chaning graphs
     for (int i = 0; i < GRAPH_ARRAY_S - 1; i++) {
         graph->raw_data[i] = graph->raw_data[i + 1];
     }
     graph->raw_data[GRAPH_ARRAY_S - 1] = data;
-    // printf("Data value at position for %s _x: %d _y: %d\n", graph->title, graph->proc_data[0][0], graph->proc_data[0][1]);
-    // printf("Unprocessed data at index 0: %d and at index 4: %d\n", (int)(graph->raw_data[0]), (int)(graph->raw_data[1]));
-    // int *starter = (*graph).proc_data[0];
 }
 
 void data_graph_init(void) {
@@ -422,7 +393,7 @@ static void graph_run(graph_t *graph) {
 
 void dashboard_show(float d_temp, float d_hum, float d_soil_mois, float d_wind_speed) {
     add_another_value(&temp, d_temp); add_another_value(&soil_mois, d_soil_mois);
-    add_another_value(&hum, d_hum); add_another_value(&wind_speed, d_wind_speed);
+    add_another_value(&hum, d_hum); add_another_value(&wind_speed, d_wind_speed * 10);
     
     graph_run(&temp); graph_run(&hum); graph_run(&soil_mois);  graph_run(&wind_speed);
     dashboard_draw_data(data_yes); dashboard_draw_data(data_today);
