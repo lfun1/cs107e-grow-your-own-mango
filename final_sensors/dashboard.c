@@ -277,7 +277,7 @@ static void draw_axis_units(graph_t graph) {
     gl_draw_string(vert_x_label, y_max, "min", GL_MAGENTA);
     
     if (strcmp(wind_speed.title, graph.title) == 0) {
-        gl_draw_string(vert_x_label, y_min, "4", GL_MAGENTA);
+        gl_draw_string(vert_x_label, y_min, "5", GL_MAGENTA);
         gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "0", GL_MAGENTA);
         
     } else if (strcmp(hum.title, graph.title) == 0 || strcmp(temp.title, graph.title) == 0) {

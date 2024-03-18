@@ -37,7 +37,7 @@ void main(void) {
     dashboard_init(2,3,GL_SILVER, GL_MOSS);
     data_graph_init();
     dashboard_draw_outline();
-    dashboard_show(70, 70, 50, 20);
+    dashboard_show(70, 70, 50, 2.5);
     pause("Go to next");
 
     // Init all sensors
@@ -67,7 +67,8 @@ void main(void) {
         printf("Humidity: %d\n", (int)d_hum);
         printf("Soil moisture: %d%%\n", (int)d_soil_mois);
         printf("Wind Speed: %02d.%02d\n", (int)d_wind_speed, (int)(100*(d_wind_speed - (int)d_wind_speed)));
-        
-        pause("Go to next");
+
+        timer_delay(1);
+        //pause("Go to next");
     }
 }
