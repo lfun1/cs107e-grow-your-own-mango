@@ -43,7 +43,7 @@ typedef struct {
     float raw_data[GRAPH_ARRAY_S];
     int *proc_data[GRAPH_ARRAY_S];
     int ndata;
-    color_t c_axes, c_points;
+    color_t c_axes, c_points, c_min_max;
     char *x_y_label[2];
     float max_val;
     float min_val;
@@ -280,23 +280,23 @@ static void draw_axis_units(graph_t graph) {
 
     gl_draw_string(vert_x_label, vert_y_label, graph.x_y_label[0], graph.c_points);
     gl_draw_string(hor_x_label, hor_y_label, graph.x_y_label[1], graph.c_points);
-    gl_draw_string(vert_x_label, y_min + module.line_height, "max", GL_MAGENTA);
-    gl_draw_string(vert_x_label, y_max, "min", GL_MAGENTA);
+    gl_draw_string(vert_x_label, y_min + module.line_height, "max", graph.c_min_max);
+    gl_draw_string(vert_x_label, y_max, "min", graph.c_min_max);
     
     if (strcmp(wind_speed.title, graph.title) == 0) {
-        gl_draw_string(vert_x_label, y_min, "5", GL_MAGENTA);
-        gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "0", GL_MAGENTA);
+        gl_draw_string(vert_x_label, y_min, "5", graph.c_min_max);
+        gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "0", graph.c_min_max);
         
     } else if (strcmp(hum.title, graph.title) == 0) {
-        gl_draw_string(vert_x_label, y_min, "100", GL_MAGENTA);
-        gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "40", GL_MAGENTA);
+        gl_draw_string(vert_x_label, y_min, "100", graph.c_min_max);
+        gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "40", graph.c_min_max);
     } else if (strcmp(temp.title, graph.title) == 0) {
-        gl_draw_string(vert_x_label, y_min, "80", GL_MAGENTA);
-        gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "50", GL_MAGENTA);
+        gl_draw_string(vert_x_label, y_min, "80", graph.c_min_max);
+        gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "50", graph.c_min_max);
     }
      else {
-        gl_draw_string(vert_x_label, y_min, "100", GL_MAGENTA);
-        gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "0", GL_MAGENTA);
+        gl_draw_string(vert_x_label, y_min, "100", graph.c_min_max);
+        gl_draw_string(vert_x_label, y_max - module.line_height + LINE_SPACING, "0", graph.c_min_max);
     }
 }
 
@@ -361,6 +361,8 @@ void data_graph_init(void) {
     temp.c_axes = GL_BLACK, temp.c_points = label_color;
     temp.max_val = temp_max;
     temp.min_val = temp_min;
+    temp.c_min_max = GL_CAYENNE;
+
 
     graph_init(&hum, 2, 0);
     put_labels(&hum, "H/%", "time", "Humidity vs Time");
@@ -369,6 +371,7 @@ void data_graph_init(void) {
     hum.c_axes = GL_BLACK, hum.c_points = label_color;
     hum.max_val = 100;
     hum.min_val = 40;
+    hum.c_min_max = GL_CAYENNE;
 
     
     graph_init(&soil_mois, 1, 1);
@@ -378,6 +381,7 @@ void data_graph_init(void) {
     soil_mois.c_axes = GL_BLACK, soil_mois.c_points = label_color;
     soil_mois.max_val = 100;
     soil_mois.min_val = 0;
+    soil_mois.c_min_max = GL_CAYENNE;
 
     graph_init(&wind_speed, 2, 1);
     put_labels(&wind_speed, "mph", "time", "Wind Speed vs Time");
@@ -387,6 +391,7 @@ void data_graph_init(void) {
     wind_speed.c_axes = GL_BLACK, wind_speed.c_points = label_color;
     wind_speed.max_val = 5;
     wind_speed.min_val = 0;
+    wind_speed.c_min_max = GL_CAYENNE;
 
     data_today.x = 0, data_today.y = 0;
     data_today.title = "Today";
