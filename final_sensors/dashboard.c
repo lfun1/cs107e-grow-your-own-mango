@@ -53,6 +53,7 @@ typedef struct {
     const char *title;
     float temp, soil_mois, humidty;
     int pressure;
+    float wind_speed;
     color_t c_contents;
 } processed_data_t;
 
@@ -345,37 +346,39 @@ void data_graph_init(void) {
     float initial_soil_mois = 50;
     float initial_wind_speed = 2.5;
 
+    color_t label_color = GL_BLUE;
+
     graph_init(&temp, 1, 0);
-    put_labels(&temp, "T/F", "t/min", "Temp vs Time");
+    put_labels(&temp, "T/F", "time", "Temperature vs Time");
     temp.raw_data[0] = initial_temp; temp.raw_data[1] = initial_temp; temp.raw_data[2] = initial_temp;
     temp.raw_data[3] = initial_temp; temp.raw_data[4] = initial_temp;
-    temp.c_axes = GL_BLACK, temp.c_points = GL_RED;
+    temp.c_axes = GL_BLACK, temp.c_points = label_color;
     temp.max_val = temp_max;
     temp.min_val = temp_min;
 
     graph_init(&hum, 2, 0);
-    put_labels(&hum, "H/%", "t/day", "Hum vs Time(Day)");
+    put_labels(&hum, "H/%", "time", "Humidity vs Time");
     hum.raw_data[0] = initial_hum; hum.raw_data[1] = 70; hum.raw_data[2] = initial_hum;
     hum.raw_data[3] = initial_hum; hum.raw_data[4] = initial_hum;
-    hum.c_axes = GL_BLACK, hum.c_points = GL_RED;
+    hum.c_axes = GL_BLACK, hum.c_points = label_color;
     hum.max_val = 100;
     hum.min_val = 40;
 
     
     graph_init(&soil_mois, 1, 1);
-    put_labels(&soil_mois, "M/%", "t/day", "Soil Moisture vs Time(Day)");
+    put_labels(&soil_mois, "M/%", "time", "Soil Moisture vs Time");
     soil_mois.raw_data[0] = initial_soil_mois; soil_mois.raw_data[1] = initial_soil_mois; soil_mois.raw_data[2] = initial_soil_mois;
     soil_mois.raw_data[3] = initial_soil_mois; soil_mois.raw_data[4] = initial_soil_mois;
-    soil_mois.c_axes = GL_BLACK, soil_mois.c_points = GL_RED;
+    soil_mois.c_axes = GL_BLACK, soil_mois.c_points = label_color;
     soil_mois.max_val = 100;
     soil_mois.min_val = 0;
 
     graph_init(&wind_speed, 2, 1);
-    put_labels(&wind_speed, "m/s", "t/min", "Wind Speed vs Time");
+    put_labels(&wind_speed, "mph", "time", "Wind Speed vs Time");
     wind_speed.raw_data[0] = initial_wind_speed; wind_speed.raw_data[1] = initial_wind_speed;
     wind_speed.raw_data[2] = initial_wind_speed;
     wind_speed.raw_data[3] = initial_wind_speed; wind_speed.raw_data[4] = initial_wind_speed;
-    wind_speed.c_axes = GL_BLACK, wind_speed.c_points = GL_RED;
+    wind_speed.c_axes = GL_BLACK, wind_speed.c_points = label_color;
     wind_speed.max_val = 5;
     wind_speed.min_val = 0;
 
@@ -383,6 +386,7 @@ void data_graph_init(void) {
     data_today.title = "Today";
     data_today.temp = 50.23, data_today.soil_mois = 45.20, data_today.pressure = 101325;
     data_today.humidty = 99.99;
+    data_today.wind_speed = 0;
     data_today.c_contents = GL_BLACK;
 
     data_yes.x = 0, data_yes.y = 1;
@@ -398,11 +402,12 @@ static void graph_run(graph_t *graph) {
     dashboard_draw_graph(graph);
 }
 
-void dashboard_show(float d_temp, float d_hum, float d_soil_mois, float d_wind_speed) {
+void dashboard_show(float d_temp, float d_hum, float d_soil_mois, float d_wind_speed, float d_pressure) {
     add_another_value(&temp, d_temp); add_another_value(&soil_mois, d_soil_mois);
     add_another_value(&hum, d_hum); add_another_value(&wind_speed, d_wind_speed);
     
     graph_run(&temp); graph_run(&hum); graph_run(&soil_mois);  graph_run(&wind_speed);
+    dashboard_update_data(d_temp, d_num, d_soil_mois, d_wind_speed, d_pressure);
     dashboard_draw_data(data_yes); dashboard_draw_data(data_today);
     gl_swap_buffer();
 }
@@ -412,4 +417,10 @@ void print_all_graphs(void) {
         printf("index: %d , _x: %d , _y: %d ", i, temp.proc_data[i][0], temp.proc_data[i][1]);
     }
     printf("\n");
+}
+
+static void dashboard_update_data(float d_temp, float d_hum, float d_soil_mois, float d_wind_speed, float d_pressure) {
+    data_today.temp = d_temp, data_today.soil_mois = d_soil_mois, data_today.pressure = pressure;
+    data_today.humidty = d_hum;
+    data_today.wind_speed = d_wind_speed;
 }

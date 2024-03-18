@@ -20,10 +20,6 @@ void hall_init(gpio_id_t input_pin) {
     gpio_set_pullup(pin);
 }
 
-static void print_magnet(unsigned int val) {
-    printf(val ?  "magnet out of range\n" : "magnet detected\n" );
-}
-
 static unsigned long get_time_detected() {
     while(gpio_read(pin) == 1) {} // wait for low
     while(gpio_read(pin) == 0) {} // wait for high
