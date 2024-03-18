@@ -397,8 +397,9 @@ void data_graph_init(void) {
 
     data_yes.x = 0, data_yes.y = 1;
     data_yes.title = "Yesterday";
-    data_yes.temp = 80.45, data_yes.soil_mois = 56.35, data_yes.pressure = 101000;
-    data_yes.humidty = 75.25;
+    data_yes.temp = 72.69, data_yes.soil_mois = 3.91, data_yes.pressure = 101668;
+    data_yes.humidty = 47.82;
+    data_yes.wind_speed = 4.07;
     data_yes.c_contents = GL_BLACK;
 }
 
@@ -408,12 +409,18 @@ static void graph_run(graph_t *graph) {
     dashboard_draw_graph(graph);
 }
 
+static void dashboard_update_data(float d_temp, float d_hum, float d_soil_mois, float d_wind_speed, float d_pressure) {
+    data_today.temp = d_temp, data_today.soil_mois = d_soil_mois, data_today.pressure = d_pressure;
+    data_today.humidty = d_hum;
+    data_today.wind_speed = d_wind_speed;
+}
+
 void dashboard_show(float d_temp, float d_hum, float d_soil_mois, float d_wind_speed, float d_pressure) {
     add_another_value(&temp, d_temp); add_another_value(&soil_mois, d_soil_mois);
     add_another_value(&hum, d_hum); add_another_value(&wind_speed, d_wind_speed);
     
     graph_run(&temp); graph_run(&hum); graph_run(&soil_mois);  graph_run(&wind_speed);
-    dashboard_update_data(d_temp, d_num, d_soil_mois, d_wind_speed, d_pressure);
+    dashboard_update_data(d_temp, d_hum, d_soil_mois, d_wind_speed, d_pressure);
     dashboard_draw_data(data_yes); dashboard_draw_data(data_today);
     gl_swap_buffer();
 }
@@ -425,8 +432,3 @@ void print_all_graphs(void) {
     printf("\n");
 }
 
-static void dashboard_update_data(float d_temp, float d_hum, float d_soil_mois, float d_wind_speed, float d_pressure) {
-    data_today.temp = d_temp, data_today.soil_mois = d_soil_mois, data_today.pressure = pressure;
-    data_today.humidty = d_hum;
-    data_today.wind_speed = d_wind_speed;
-}

@@ -15,19 +15,19 @@ void soil_moisture_init(unsigned int channel) {
 }
 
 // Read soil moisture AOUT through MCP3008 Channel 0
-int soil_moisture_read(void) {
+float soil_moisture_read(void) {
     // Values read when completely dry and completely in water
     static const int DRY = 860, WATER = 400;
     
     int moisture = mcp3008_read(mcp_channel);
     //printf("Soil Moisture value read: %04d\n", moisture);
     
-    int moisture_percent = 0;
+    float moisture_percent = 0;
     if (moisture > DRY) {
-        moisture_percent = 100;
+        moisture_percent = (float)100;
     }
     else if (moisture > WATER) {
-        moisture_percent = 100 * (DRY - moisture) / (DRY - WATER);
+        moisture_percent = 100.0 * (DRY - moisture) / (float)(DRY - WATER);
     }
     //printf("Moisture: %02d%%\n", moisture_percent);
     return moisture_percent;

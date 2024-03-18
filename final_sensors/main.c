@@ -37,7 +37,7 @@ void main(void) {
     dashboard_init(2,3,GL_SILVER, GL_MOSS);
     data_graph_init();
     dashboard_draw_outline();
-    dashboard_show(70, 70, 50, 2.5);
+    dashboard_show(70, 70, 50, 2.5, 101325);
     pause("Go to next");
 
     // Init all sensors
@@ -50,17 +50,18 @@ void main(void) {
     gpio_set_output(GPIO_MCP);
     gpio_write(GPIO_MCP, 0);
     
-    float d_temp, d_hum, d_soil_mois, d_wind_speed;
+    float d_temp, d_hum, d_soil_mois, d_wind_speed, d_pressure;
 
     while (1) {
         d_temp = readTemperature() * 1.8 + 32;
         d_hum = readHumidity();
+        d_pressure = readPressure();
         gpio_write(GPIO_MCP, 1);
         d_soil_mois = soil_moisture_read();
         gpio_write(GPIO_MCP, 0);
         d_wind_speed = hall_read_speed();
         dashboard_draw_outline();
-        dashboard_show(d_temp, d_hum, d_soil_mois, d_wind_speed);
+        dashboard_show(d_temp, d_hum, d_soil_mois, d_wind_speed, d_pressure);
 
         // Print all values
         printf("Temperature: %d\n", (int)d_temp);
