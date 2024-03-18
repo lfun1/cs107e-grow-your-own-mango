@@ -366,10 +366,10 @@ void data_graph_init(void) {
 
     graph_init(&wind_speed, 2, 1);
     put_labels(&wind_speed, "m/s", "t/min", "Wind Speed vs Time");
-    wind_speed.raw_data[0] = 20; wind_speed.raw_data[1] = 20; wind_speed.raw_data[2] = 20;
-    wind_speed.raw_data[3] = 20; wind_speed.raw_data[4] = 20;
+    wind_speed.raw_data[0] = 2.5; wind_speed.raw_data[1] = 2.5; wind_speed.raw_data[2] = 2.5;
+    wind_speed.raw_data[3] = 2.5; wind_speed.raw_data[4] = 2.5;
     wind_speed.c_axes = GL_BLACK, wind_speed.c_points = GL_RED;
-    wind_speed.max_val = 40;
+    wind_speed.max_val = 5;
     wind_speed.min_val = 0;
 
     data_today.x = 0, data_today.y = 0;
@@ -393,7 +393,7 @@ static void graph_run(graph_t *graph) {
 
 void dashboard_show(float d_temp, float d_hum, float d_soil_mois, float d_wind_speed) {
     add_another_value(&temp, d_temp); add_another_value(&soil_mois, d_soil_mois);
-    add_another_value(&hum, d_hum); add_another_value(&wind_speed, d_wind_speed * 10);
+    add_another_value(&hum, d_hum); add_another_value(&wind_speed, d_wind_speed);
     
     graph_run(&temp); graph_run(&hum); graph_run(&soil_mois);  graph_run(&wind_speed);
     dashboard_draw_data(data_yes); dashboard_draw_data(data_today);

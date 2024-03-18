@@ -58,7 +58,7 @@ void main(void) {
         gpio_write(GPIO_MCP, 1);
         d_soil_mois = soil_moisture_read();
         gpio_write(GPIO_MCP, 0);
-        d_wind_speed = hall_read_speed()*10;
+        d_wind_speed = hall_read_speed();
         dashboard_draw_outline();
         dashboard_show(d_temp, d_hum, d_soil_mois, d_wind_speed);
 
