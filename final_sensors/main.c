@@ -64,7 +64,9 @@ static void test_two_spi(void) {
         gpio_write(GPIO_MCP, 0);
 
         gpio_write(GPIO_BME, 1);
-        printf("Temperature read: %d\n", (int)(readTemperature()*100));
+        float temperature = readTemperature();
+        printf("Temperature read: %d.%02d\n", (int)(temperature), (int)(temperature*100) - (int)(temperature) * 100);
+        
         printf("Pressure read: %d\n", (int)(readPressure()));
         printf("Humidity read: %d\n", (int)(readHumidity()));
         gpio_write(GPIO_BME, 0);
@@ -79,5 +81,6 @@ void main(void)  {
 
     //test_bme280();
     //test_soil_moisture();
-    test_two_spi();
+    //test_two_spi();
+    test_hall();
 }
