@@ -11,12 +11,13 @@
 #include "strings.h"
 #include "printf.h"
 
-#define DATA_SIZE 4
+#define DATA_SIZE 5
 #define LINE_LEN 26
 #define TEMP_INDEX 0
 #define SOIL_INDEX 1
 #define HUMI_INDEX 2
 #define PRES_INDEX 3
+#define WIND_S_INDEX 4
 #define ADJUST 3
 #define LABEL_SIZE 8
 #define GRAPH_ARRAY_S 5
@@ -59,7 +60,7 @@ typedef struct {
 
 void data_strings_init(void);
 
-static char *data_strings[4];
+static char *data_strings[5];
 
 const static int LINE_SPACING = 5;
 
@@ -129,6 +130,7 @@ void data_strings_init(void) {
     strlcat(data_strings[1], "Soil Moisture: ", LINE_LEN);
     strlcat(data_strings[2], "Humidity:  ", LINE_LEN);
     strlcat(data_strings[3], "Pressure: ", LINE_LEN);
+    strlcat(data_strings[4], "Wind Speed: ", LINE_LEN);
 }
 
 void dashboard_draw_outline(void) {
@@ -212,6 +214,10 @@ static void dashboard_draw_data(processed_data_t this_data) {
             case PRES_INDEX:
                 num_dec = (int)this_data.pressure;
                 snprintf(buf, LINE_LEN, "%d Pa", this_data.pressure);
+                break;
+            case WIND_S_INDEX:
+                num_dec = (int)this_data.wind_speed;
+                snprintf(buf, LINE_LEN, "%d.%02d mph", (int)this_data.wind_speed, (int)((this_data.wind_speed - num_dec) * 100));
                 break;
         }
         line_len = strlen(data_strings[i]);
