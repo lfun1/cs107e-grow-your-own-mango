@@ -3,3 +3,8 @@ main.bin
 main.elf
 main.o
 spi.o
+dashboard.o
+float_asm.o
+hall.bin
+hall.elf
+hall.o
