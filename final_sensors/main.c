@@ -13,8 +13,8 @@
 #include "gpio.h"
 #include "timer.h"
 
-const static gpio_id_t gpio_mcp = GPIO_PD22;
-const static gpio_id_t gpio_bme = GPIO_PD21;
+const static gpio_id_t GPIO_MCP = GPIO_PD22;
+const static gpio_id_t GPIO_BME = GPIO_PD21;
 
 static void test_bme280(void) {
     bme_init();
@@ -41,33 +41,33 @@ static void test_soil_moisture(void) {
     soil_moisture_init(0);
     
     while (1) {
-        gpio_write(gpio_mcp, 1);
+        gpio_write(GPIO_MCP, 1);
         printf("Soil moisture: %d%%\n", soil_moisture_read());
-        gpio_write(gpio_mcp, 0);
+        gpio_write(GPIO_MCP, 0);
         timer_delay(1);
     }
 }
 
 static void test_two_spi(void) {
     gpio_init();
-    gpio_set_output(gpio_mcp);
-    gpio_write(gpio_mcp, 0);
-    gpio_set_output(gpio_bme);
-    gpio_write(gpio_bme, 0);
+    gpio_set_output(GPIO_MCP);
+    gpio_write(GPIO_MCP, 0);
+    gpio_set_output(GPIO_BME);
+    gpio_write(GPIO_BME, 0);
 
-    soil_moisture_init(0);
     bme_init();
+    soil_moisture_init(0);
 
     while (1) {
-        gpio_write(gpio_mcp, 1);
+        gpio_write(GPIO_MCP, 1);
         printf("Soil moisture: %d%%\n", soil_moisture_read());
-        gpio_write(gpio_mcp, 0);
+        gpio_write(GPIO_MCP, 0);
 
-        gpio_write(gpio_bme, 1);
+        gpio_write(GPIO_BME, 1);
         printf("Temperature read: %d\n", (int)(readTemperature()*100));
         printf("Pressure read: %d\n", (int)(readPressure()));
         printf("Humidity read: %d\n", (int)(readHumidity()));
-        gpio_write(gpio_bme, 0);
+        gpio_write(GPIO_BME, 0);
 
         timer_delay(1);
     }
@@ -78,6 +78,6 @@ void main(void)  {
     uart_putstring("Starting main in final_sensors\n");
 
     //test_bme280();
+    //test_soil_moisture();
     test_two_spi();
-    test_soil_moisture();
 }
