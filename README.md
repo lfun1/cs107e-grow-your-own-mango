@@ -74,13 +74,26 @@ Over the course of our project, we spent long hours reading through data sheets,
     - Helped Lisa identify incorrect wiring of Hall effect sensor from breakout board
 
 ### Sources Used
+- [Julie's Sensors Lecture code](https://github.com/cs107e/cs107e.github.io/blob/master/lectures/Sensors/code/)
+- [Yifan's SPI Hardware Driver](https://github.com/cs107e/cs107e.github.io/tree/master/cs107e/extras/spi_peripheral)
+- [Adafruit BME280 Sensor Library](https://github.com/adafruit/Adafruit_BME280_Library)
 - [jostak's anemometer design on Thingiverse](https://www.thingiverse.com/thing:2559929)
 - [tosa's plant irrigation ring](https://www.thingiverse.com/thing:6491638) (used as inspiration)
-- [Julie's Sensors Lecture code](https://github.com/cs107e/cs107e.github.io/blob/master/lectures/Sensors/code/)
-- 
+- [Solenoid valve circuit control with Arduino](https://bc-robotics.com/tutorials/controlling-a-solenoid-valve-with-arduino/)
+- [Soil Moisture Sensor connection diagram](https://www.sigmaelectronica.net/wp-content/uploads/2018/04/sen0193-humedad-de-suelos.pdf)
+- [D1-H Manual](https://cs107e.github.io/readings/d1-h_user_manual_v1.0.pdf)
+- SPI learning from [Wikipedia](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface) and [SparkFun](https://learn.sparkfun.com/tutorials/serial-peripheral-interface-spi/all)
+- [MOSFET Transistor IRLZ34N Datasheet](https://www.mouser.com/datasheet/2/196/Infineon_IRLZ34N_DataSheet_v01_01_EN-3363624.pdf)
 
 ## Future Improvements
-- File system to store data read
+- File system to store data
 - More robust irrigation system with 3D printed components to hold solenoid valve, water supply in place
 
 ## Folder Organization
+- bme280
+- dashboard
+- final_sensors
+- hall_sensor
+- improved_spi
+- mcp3008
+- project_part
