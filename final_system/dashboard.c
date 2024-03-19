@@ -37,11 +37,13 @@ static struct {
     //.contents = NULL,
 };
 
+
+// 'graph_t' bundles data for each graph.
 typedef struct {
     int x, y; // index of graph pane
     const char *title;
     float raw_data[GRAPH_ARRAY_S];
-    int *proc_data[GRAPH_ARRAY_S];
+    int *proc_data[GRAPH_ARRAY_S]; // Store data in the form [x][y]
     int ndata;
     color_t c_axes, c_points, c_min_max;
     char *x_y_label[2];
@@ -49,6 +51,8 @@ typedef struct {
     float min_val;
 } graph_t;
 
+// 'processed_data_t' bundles data to be shown on the data
+// panel of the display.
 typedef struct {
     int x, y;
     const char *title;
@@ -58,11 +62,20 @@ typedef struct {
     color_t c_contents;
 } processed_data_t;
 
-void data_strings_init(void);
+// define graphs and data instances static so they're available
+// globally in this file.
+static graph_t temp;
+static graph_t hum;
+static graph_t soil_mois;
+static graph_t wind_speed;
+static processed_data_t data_today;
+static processed_data_t data_yes;
 
-static char *data_strings[5];
-
+static char *data_strings[5]; // Store constant string for the displaying the data.
 const static int LINE_SPACING = 5;
+
+// 'data_strings_init' is called before definition prototype needed.
+static void data_strings_init(void);
 
 void dashboard_init(int nrows, int ncols, color_t foreground, color_t background) {
     const static int FB_WIDTH = 1280;
@@ -125,7 +138,9 @@ void dashboard_init(int nrows, int ncols, color_t foreground, color_t background
     gl_swap_buffer(); // Show contents
 }
 
-void data_strings_init(void) {
+// Helper function 'data_strings_init' initialize the 'data_strings'
+// array to store constant strings.
+static void data_strings_init(void) {
     strlcat(data_strings[0], "Temperature: ", LINE_LEN);
     strlcat(data_strings[1], "Soil Moisture: ", LINE_LEN);
     strlcat(data_strings[2], "Humidity:  ", LINE_LEN);
@@ -141,28 +156,6 @@ void dashboard_draw_outline(void) {
         }
     }
 }
-
-void dashboard_clear(void) {
-}
-
-
-/*
- * title is a string, clipped if too long
- * data is a 2D array with dimension 2 x npoints.
- *     the first npoints are x values
- *     the next npoints are corresponding y values
- * axes color, point color
- */
-
-
-
-static graph_t temp;
-static graph_t hum;
-static graph_t soil_mois;
-static graph_t wind_speed;
-static processed_data_t data_today;
-static processed_data_t data_yes;
-
 
 // Draw title, clip if too long
 // x, y are the pane index
@@ -183,13 +176,14 @@ static void dashboard_draw_title(int x, int y, const char* title, color_t c) {
     }
 }
 
+// Helper function 'dashboard_draw_data' draw the data passed on the
+// dashboard.
 static void dashboard_draw_data(processed_data_t this_data) {
     dashboard_draw_title(this_data.x, this_data.y, this_data.title, this_data.c_contents);
     int ch_height = gl_get_char_height();
 
     int x_start = module.panes_x[this_data.x] + LINE_SPACING + 2 * gl_get_char_width();
     int y_start = module.panes_y[this_data.y] + LINE_SPACING + 2 * ch_height;
-    // int y_end = y_start module.pane_height;
     int cur_y = y_start;
     char buf[LINE_LEN];
 
@@ -307,14 +301,6 @@ static void get_plotting_points(graph_t *graph) {
     int y_min = get_pane_y_min(graph->y) + module.line_height;
     int y_max = get_pane_y_max(graph->y) - module.line_height;
 
-    // float data_min = graph->raw_data[0]; float data_max = graph->raw_data[0];
-
-    // // Get the max and min of the data values.
-    // for (int i = 1; i < GRAPH_ARRAY_S; i++) {
-    //     if (graph->raw_data[i] < data_min) data_min = graph->raw_data[i];
-    //     if (graph->raw_data[i] > data_max) data_max = graph->raw_data[i];
-    // }
-    
     int hor_gap = (x_max - x_min) / GRAPH_ARRAY_S;
     int graph_height = (y_max - y_min) / 2;
     int cur_y = y_max;
@@ -347,52 +333,49 @@ static void add_another_value(graph_t *graph, float data) {
 }
 
 void data_graph_init(void) {
-    float initial_temp = 70; float temp_max = 80;
-    float initial_hum = 70; float temp_min = 50;
-    float initial_soil_mois = 50;
-    float initial_wind_speed = 2.5;
-
+    float initial_temp = 70; float temp_min = 50; float temp_max = 80;
+    float initial_hum = 70; float hum_min = 40; float hum_max = 100;
+    float initial_soil_mois = 50; float soil_mois_min = 0; float soil_mois_max = 100;
+    float initial_wind_speed = 2.5; float w_spd_min = 0; float w_spd_max = 5;
     color_t label_color = GL_BLUE;
 
+    // Initialize the temperature graph.
     graph_init(&temp, 1, 0);
     put_labels(&temp, "T/F", "time", "Temperature vs Time");
-    temp.raw_data[0] = initial_temp; temp.raw_data[1] = initial_temp; temp.raw_data[2] = initial_temp;
-    temp.raw_data[3] = initial_temp; temp.raw_data[4] = initial_temp;
-    temp.c_axes = GL_BLACK, temp.c_points = label_color;
-    temp.max_val = temp_max;
-    temp.min_val = temp_min;
-    temp.c_min_max = GL_CAYENNE;
+    for (int i = 0; i < GRAPH_ARRAY_S; i++) {
+        temp.raw_data[i] = initial_temp;
+    }
+    temp.c_axes = GL_BLACK, temp.c_points = label_color; temp.c_min_max = GL_CAYENNE;
+    temp.max_val = temp_max; temp.min_val = temp_min;
 
-
+    // Initialize the humidity graph.
     graph_init(&hum, 2, 0);
     put_labels(&hum, "H/%", "time", "Humidity vs Time");
-    hum.raw_data[0] = initial_hum; hum.raw_data[1] = 70; hum.raw_data[2] = initial_hum;
-    hum.raw_data[3] = initial_hum; hum.raw_data[4] = initial_hum;
-    hum.c_axes = GL_BLACK, hum.c_points = label_color;
-    hum.max_val = 100;
-    hum.min_val = 40;
-    hum.c_min_max = GL_CAYENNE;
-
+    for (int j = 0; j < GRAPH_ARRAY_S; j++) {
+        hum.raw_data[j] = initial_hum;
+    }
+    hum.c_axes = GL_BLACK, hum.c_points = label_color; hum.c_min_max = GL_CAYENNE;
+    hum.max_val = hum_max; hum.min_val = hum_min;
     
+    // Initialize the soil moisture graph.
     graph_init(&soil_mois, 1, 1);
     put_labels(&soil_mois, "M/%", "time", "Soil Moisture vs Time");
-    soil_mois.raw_data[0] = initial_soil_mois; soil_mois.raw_data[1] = initial_soil_mois; soil_mois.raw_data[2] = initial_soil_mois;
-    soil_mois.raw_data[3] = initial_soil_mois; soil_mois.raw_data[4] = initial_soil_mois;
-    soil_mois.c_axes = GL_BLACK, soil_mois.c_points = label_color;
-    soil_mois.max_val = 100;
-    soil_mois.min_val = 0;
-    soil_mois.c_min_max = GL_CAYENNE;
+    for (int k = 0; k < GRAPH_ARRAY_S; k++) {
+        soil_mois.raw_data[k] = initial_soil_mois;
+    }
+    soil_mois.c_axes = GL_BLACK, soil_mois.c_points = label_color; soil_mois.c_min_max = GL_CAYENNE;
+    soil_mois.max_val = soil_mois_max; soil_mois.min_val = soil_mois_min;
 
+    // Initialize the wind speed graph.
     graph_init(&wind_speed, 2, 1);
     put_labels(&wind_speed, "mph", "time", "Wind Speed vs Time");
-    wind_speed.raw_data[0] = initial_wind_speed; wind_speed.raw_data[1] = initial_wind_speed;
-    wind_speed.raw_data[2] = initial_wind_speed;
-    wind_speed.raw_data[3] = initial_wind_speed; wind_speed.raw_data[4] = initial_wind_speed;
-    wind_speed.c_axes = GL_BLACK, wind_speed.c_points = label_color;
-    wind_speed.max_val = 5;
-    wind_speed.min_val = 0;
-    wind_speed.c_min_max = GL_CAYENNE;
-
+    for (int l = 0; l < GRAPH_ARRAY_S; l++) {
+        wind_speed.raw_data[l] = initial_wind_speed;
+    }
+    wind_speed.c_axes = GL_BLACK, wind_speed.c_points = label_color; wind_speed.c_min_max = GL_CAYENNE;
+    wind_speed.max_val = w_spd_max; wind_speed.min_val = w_spd_min;
+    
+    // Initialize data Today.
     data_today.x = 0, data_today.y = 0;
     data_today.title = "Today";
     data_today.temp = 50.23, data_today.soil_mois = 45.20, data_today.pressure = 101325;
@@ -400,6 +383,7 @@ void data_graph_init(void) {
     data_today.wind_speed = 0;
     data_today.c_contents = GL_BLACK;
 
+    // Initialize data Yesterday. 
     data_yes.x = 0, data_yes.y = 1;
     data_yes.title = "Yesterday";
     data_yes.temp = 72.69, data_yes.soil_mois = 3.91, data_yes.pressure = 101668;
@@ -429,11 +413,3 @@ void dashboard_show(float d_temp, float d_hum, float d_soil_mois, float d_wind_s
     dashboard_draw_data(data_yes); dashboard_draw_data(data_today);
     gl_swap_buffer();
 }
-
-void print_all_graphs(void) {
-    for (int i = 0; i < GRAPH_ARRAY_S; i++) {
-        printf("index: %d , _x: %d , _y: %d ", i, temp.proc_data[i][0], temp.proc_data[i][1]);
-    }
-    printf("\n");
-}
-
