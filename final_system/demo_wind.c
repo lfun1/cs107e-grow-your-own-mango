@@ -22,7 +22,7 @@ const static gpio_id_t GPIO_VALVE = GPIO_PD17;
 
 void main(void) {
     uart_init();
-    uart_putstring("Starting wind demo!");
+    uart_putstring("Starting wind demo!\n");
 
     // Show dashboard
     dashboard_init(2,3,GL_SILVER, GL_MOSS);
