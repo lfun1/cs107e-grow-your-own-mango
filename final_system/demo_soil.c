@@ -24,7 +24,7 @@ const static gpio_id_t GPIO_VALVE = GPIO_PD17;
 void main(void) {
     //config_float();
     uart_init();
-    uart_putstring("Hello, world!\n");
+    uart_putstring("Running soil demo!\n");
 
     // Show dashboard
     dashboard_init(2,3,GL_SILVER, GL_MOSS);
