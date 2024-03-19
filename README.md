@@ -6,6 +6,8 @@
 ## Project Overview
 For our CS107E final project, we wanted to interact with the real-world and build a practical tool that can help gardeners. We built a weather station that can sense temperature, humidity, pressure, and wind speed using the BME280 sensor and an anemometer. We also designed and built a drip irrigation system that tracks soil moisture using a soil moisture sensor and waters plants using a solenoid valve depending on the soil moisture level. Finally, we integrated all the sensor data and displayed it on a dashboard with graphs and data values.
 
+**Our main code is in the `final_system` directory**, which includes our final `bme280`, `dashboard`, `hall`, `mcp3008` (from Julie), `spi` (from Yifan), and `soil_moisture` modules. It also has a `demo_wind` and `demo_soil` for demos of the wind speed reading in our weather system and soil moisture-controlled drip irrigation system. The other folders are earlier versions of individual modules.
+
 ## Accomplished
 1. Wrote and adapted **drivers to read in sensor data and control solenoid valve**
     - **BME280 sensor:** We worked together to convert Adafruit's BME280 Sensor Library written in C++ to C code that can run on MangoPi and work with Yifan Yang's SPI module.
@@ -88,12 +90,3 @@ Over the course of our project, we spent long hours reading through data sheets,
 ## Future Improvements
 - File system to store data
 - More robust irrigation system with 3D printed components to hold solenoid valve, water supply in place
-
-## Folder Organization
-- bme280
-- dashboard
-- final_sensors
-- hall_sensor
-- improved_spi
-- mcp3008
-- project_part
