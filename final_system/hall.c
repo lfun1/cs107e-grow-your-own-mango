@@ -1,4 +1,9 @@
-/* Hall sensor implementation */
+/* Hall sensor implementation 
+ *
+ * Lisa Fung
+ * 
+ * Based on Julie's Hall Sensor code in Sensors Lecture
+ */
 
 #include "hall.h"
 #include "timer.h"

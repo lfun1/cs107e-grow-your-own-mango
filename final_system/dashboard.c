@@ -1,7 +1,7 @@
 /* File: dashboard.c
  * ---------------
  * Implementation for dashboard module to display data and graphs.
- * Lisa Fung
+ * Elias Chikwanda, Lisa Fung
  */
 
 #include "gl.h"

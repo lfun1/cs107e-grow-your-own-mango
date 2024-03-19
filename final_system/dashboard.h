@@ -3,7 +3,7 @@
 /* 
  * Module to display dashboard with sensor data and graphs.
  *
- * Author: Lisa Fung
+ * Author: Elias Chikwanda, Lisa Fung
  */
 
 #include "gl.h"

@@ -1,3 +1,5 @@
+/* Julie's MCP3008 code */
+
 #ifndef MCP3008_H
 #define MCP3008_H
 

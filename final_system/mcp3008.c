@@ -1,3 +1,5 @@
+/* Julie's MCP3008 code */
+
 #include "spi.h"
 #include "mcp3008.h"
 
