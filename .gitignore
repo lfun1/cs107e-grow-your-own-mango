@@ -8,3 +8,6 @@ float_asm.o
 hall.bin
 hall.elf
 hall.o
+bme280.o
+mcp3008.o
+soil_moisture.o
