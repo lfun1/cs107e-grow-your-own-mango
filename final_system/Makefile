@@ -1,9 +1,9 @@
 # Builds example program against libmymango
 
 PROGRAM = main.bin
-SOURCES = $(PROGRAM:.bin=.c) spi.c mcp3008.c hall.c bme280.c soil_moisture.c dashboard.c
+SOURCES = spi.c mcp3008.c hall.c bme280.c soil_moisture.c dashboard.c
 
-# Add source files in SOURCES.
+# Add source files in SOURCES
 # Using Lisa's mylibmango.a
 ############################################
 
@@ -25,7 +25,7 @@ OBJECTS = $(addsuffix .o, $(basename $(SOURCES)))
 	riscv64-unknown-elf-objcopy $< -O binary $@
 
 # Link program executable from all common objects
-%.elf: $(OBJECTS) libmymango.a
+%.elf: $(OBJECTS) libmymango.a %.o
 	riscv64-unknown-elf-gcc $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 # Compile C source to object file
@@ -44,6 +44,14 @@ OBJECTS = $(addsuffix .o, $(basename $(SOURCES)))
 run: $(PROGRAM)
 	mango-run $<
 
+# Build and run wind demo
+wind: demo_wind.bin
+	mango-run $<
+
+# Build and run wind demo
+soil: demo_soil.bin
+	mango-run $<
+
 # Remove all build products
 clean:
 	rm -f *.o *.bin *.elf *.list *~
@@ -56,7 +64,7 @@ $(SOURCES):
 libmymango.a:
 	$(error cannot find libmymango.a Change to mylib directory to build, then copy here)
 
-.PHONY: all clean run
+.PHONY: all clean run wind
 .PRECIOUS: %.elf %.o
 
 # disable built-in rules (they are not used)
