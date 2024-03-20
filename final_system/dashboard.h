@@ -22,20 +22,11 @@
  */
 void dashboard_init(int nrows, int ncols, color_t foreground, color_t background);
 
-/*
- * `dashboard_clear`
- *
- * Clear all dashboard data and graphs to only display panes.
- */
-void dashboard_clear(void);
-
 void dashboard_draw_outline(void);
 
 void dashboard_show(float d_temp, float d_hum, float d_soil_mois, float d_wind_speed, float d_pressure);
 
 void change_data(void);
-
-void print_all_graphs(void);
 
 void data_graph_init(void);
 
