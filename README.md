@@ -8,7 +8,7 @@ For our CS107E final project, we wanted to interact with the real-world and buil
 
 **Our main code is in the `final_system` directory**, which includes our final `bme280`, `dashboard`, `hall`, `mcp3008` (from Julie), `spi` (from Yifan), and `soil_moisture` modules. It also has a `demo_wind` and `demo_soil` for demos of the wind speed reading in our weather system and soil moisture-controlled drip irrigation system. The other folders are earlier versions of individual modules.
 
-Here's a brief **[Video Walkthrough](https://drive.google.com/file/d/1vzNtPPHP5Z17ISakldckmiHYQMkftJek/view?usp=drive_link)** of our project!
+Here's a brief **[Video Walkthrough](https://youtu.be/gMe3_3uqGeU)** of our project!
 
 ## Accomplished
 1. Wrote and adapted **drivers to read in sensor data and control solenoid valve**
