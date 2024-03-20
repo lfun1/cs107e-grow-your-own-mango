@@ -220,7 +220,23 @@ static void dashboard_draw_data(processed_data_t this_data) {
         gl_draw_string(x_start, cur_y, data_strings[i], this_data.c_contents);
         data_strings[i][line_len] = '\0';
     }
-    // Draw mango
+    
+    // Draw "Grow Your Own Mango!" Logo
+    if (strcmp(this_data.title, "Today") == 0) {
+        int logo_x = x_start, logo_y = cur_y + ch_height + LINE_SPACING + module.pane_height/12;
+        gl_draw_rect(logo_x, logo_y, module.pane_width - 2 * LINE_SPACING - 4 * gl_get_char_width(), module.pane_height/6, GL_AMBER);
+        gl_draw_string(logo_x + 2*gl_get_char_width(), logo_y + ch_height + LINE_SPACING, "Grow Your Own Mango!", GL_MOSS);
+
+        // Mango
+        int mango_x = logo_x + 135, mango_y = logo_y + module.pane_height/6 + 1.5*ch_height;
+        color_t mango_color = GL_AMBER, mango_leaf = GL_MOSS;
+        gl_draw_rect(mango_x, mango_y, 20, 40, mango_color);
+        gl_draw_triangle(mango_x-8, mango_y+30, mango_x, mango_y, mango_x, mango_y+39, mango_color);        
+        gl_draw_triangle(mango_x+20+6, mango_y+15, mango_x+20, mango_y, mango_x+20, mango_y+39, mango_color);
+        gl_draw_triangle(mango_x+20, mango_y+5, mango_x+20+4, mango_y-2, mango_x+20+8, mango_y+4, mango_leaf);
+        gl_draw_triangle(mango_x+20+15, mango_y-3, mango_x+20+4, mango_y-2, mango_x+20+8, mango_y+4, mango_leaf);        
+    }
+    
 }
 
 static void graph_init(graph_t *graph, int x, int y) {
@@ -414,3 +430,4 @@ void dashboard_show(float d_temp, float d_hum, float d_soil_mois, float d_wind_s
     dashboard_draw_data(data_yes); dashboard_draw_data(data_today);
     gl_swap_buffer();
 }
+
