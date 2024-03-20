@@ -220,6 +220,7 @@ static void dashboard_draw_data(processed_data_t this_data) {
         gl_draw_string(x_start, cur_y, data_strings[i], this_data.c_contents);
         data_strings[i][line_len] = '\0';
     }
+    // Draw mango
 }
 
 static void graph_init(graph_t *graph, int x, int y) {

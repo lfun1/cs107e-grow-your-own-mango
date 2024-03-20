@@ -25,13 +25,13 @@ const static gpio_id_t GPIO_VALVE = GPIO_PD17;
 
 //extern unsigned long config_float(void);
 
-static void pause(const char *message) {
-    if (message) printf("\n%s\n", message);
-    printf("[PAUSED] type any key in minicom/terminal to continue: ");
-    int ch = uart_getchar();
-    uart_putchar(ch);
-    uart_putchar('\n');
-}
+// static void pause(const char *message) {
+//     if (message) printf("\n%s\n", message);
+//     printf("[PAUSED] type any key in minicom/terminal to continue: ");
+//     int ch = uart_getchar();
+//     uart_putchar(ch);
+//     uart_putchar('\n');
+// }
 
 /* static void switch_valve(const char *message) { */
 /*     if (message) printf("\n%s\n", message); */
@@ -55,7 +55,7 @@ void main(void) {
     data_graph_init();
     dashboard_draw_outline();
     dashboard_show(70, 70, 50, 2.5, 101325);
-    pause("Begin sensor reading");
+    //pause("Begin sensor reading");
 
     // Init all sensors
     bme_init();
