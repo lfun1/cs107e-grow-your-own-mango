@@ -4,7 +4,7 @@
 **By Lisa Fung and Elias Chikwanda**
 
 ## Project Overview
-For our CS107E final project, we wanted to interact with the real-world and build a practical tool that can help gardeners. We built a weather station that can sense temperature, humidity, pressure, and wind speed using the BME280 sensor and an anemometer. We also designed and built a drip irrigation system that tracks soil moisture using a soil moisture sensor and waters plants using a solenoid valve depending on the soil moisture level. Finally, we integrated all the sensor data and displayed it on a dashboard with graphs and data values.
+For our CS107E final project, we wanted to interact with the real world and build a practical tool that can help gardeners. We built a weather station that can sense temperature, humidity, pressure, and wind speed using the BME280 sensor and an anemometer. We also designed and built a drip irrigation system that tracks soil moisture using a soil moisture sensor and waters plants using a solenoid valve depending on the soil moisture level. Finally, we integrated all the sensor data and displayed it on a dashboard with graphs and data values.
 
 **Our main code is in the `final_system` directory**, which includes our final `bme280`, `dashboard`, `hall`, `mcp3008` (from Julie), `spi` (from Yifan), and `soil_moisture` modules. It also has a `demo_wind` and `demo_soil` for demos of the wind speed reading in our weather system and soil moisture-controlled drip irrigation system. The other folders are earlier versions of individual modules.
 
@@ -13,8 +13,8 @@ Here's a brief **[Video Walkthrough](https://youtu.be/gMe3_3uqGeU)** of our proj
 ## Accomplished
 1. Wrote and adapted **drivers to read in sensor data and control solenoid valve**
     - **BME280 sensor:** We worked together to convert Adafruit's BME280 Sensor Library written in C++ to C code that can run on MangoPi and work with Yifan Yang's SPI module.
-    - **Anemometer:** Lisa wrote a driver to read in digital Hall Effect sensor signals from anemometer and convert it to wind speed, based on Julie Zelinski's Hall effect sensor demo code.
-    - **Soil moisture sensor:** Lisa wrote driver to read in soil moisture sensor values using Julie Zelinski's MCP3008 demo code.
+    - **Anemometer:** Lisa wrote a driver to read in digital Hall Effect sensor signals from anemometer and convert it to wind speed, based on Julie Zelenski's Hall effect sensor demo code.
+    - **Soil moisture sensor:** Lisa wrote driver to read in soil moisture sensor values using Julie Zelenski's MCP3008 demo code.
     - **Solenoid valve:** Lisa wrote code to control opening and closing of solenoid valve depending on soil moisture value.
 2. **Dashboard module:** Lisa outlined and Elias wrote most of the dashboard module layered on graphics library to convert data read in from sensors and display the data on 4 graphs and 2 data panels.
 3. CAD, 3D print, and assemble components for **anemometer and drip irrigation system**
@@ -22,7 +22,7 @@ Here's a brief **[Video Walkthrough](https://youtu.be/gMe3_3uqGeU)** of our proj
     - **Drip Irrigation System:** Lisa used CAD to design and 3D print the drip irrigation spout. We worked together to create a circuit to control the solenoid valve using an external 12V power supply, receiving guidance from Jeff Stribling (Lab64). Then, we hot glued the components together and used 1/4'' outer diameter tubing to connect the solenoid valve to the water supply inlet and outlet.
 
 ## Reflection
-Over the course of our project, we spent long hours reading through data sheets, debugging code/wiring/sensors, and coming up with creative ways to see our weather station and drip irrigation system through. We spent the first week outlining the dashboard module, trying to configure the SPI hardware on the Mango Pi, setting up the Hall effect sensor, 3D printing the anemometer, and looking into the solenoid valve and other sensors. After making some progress on the SPI module, we received a working SPI driver from Yifan Yang and Julie Zelinski (thank you!). From there we focused our efforts on adapting Adafruit's BME280 library and configuring the soil moisture sensors over the weekend. In the second week, we 3D printed and assembled the anemometer with the magnet and hall sensor, implemented the dashboard module for displaying data and graphs, and wired up the solenoid valve with an external 12V power source to control water flow. Finally, we tested the individual components, figured out how to support two SPI communication channels using transistors, and updated the dashboard to accept real-time values from the sensors and update the graphs automatically. It was very rewarding to bring everything we had written and built together, and we appreciate all the support and guidance we received!
+Over the course of our project, we spent long hours reading through data sheets, debugging code/wiring/sensors, and coming up with creative ways to see our weather station and drip irrigation system through. We spent the first week outlining the dashboard module, trying to configure the SPI hardware on the Mango Pi, setting up the Hall effect sensor, 3D printing the anemometer, and looking into the solenoid valve and other sensors. After making some progress on the SPI module, we received a working SPI driver from Yifan Yang and Julie Zelenski (thank you!). From there we focused our efforts on adapting Adafruit's BME280 library and configuring the soil moisture sensors over the weekend. In the second week, we 3D printed and assembled the anemometer with the magnet and hall sensor, implemented the dashboard module for displaying data and graphs, and wired up the solenoid valve with an external 12V power source to control water flow. Finally, we tested the individual components, figured out how to support two SPI communication channels using transistors, and updated the dashboard to accept real-time values from the sensors and update the graphs automatically. It was very rewarding to bring everything we had written and built together, and we appreciate all the support and guidance we received!
 
 ### Learned
 - Serial Peripheral Interface (SPI) protocol, MCP3008 Analog-to-Digital converter communication, BME280 SPI protocol, and lots of datasheet reading
@@ -33,7 +33,7 @@ Over the course of our project, we spent long hours reading through data sheets,
 
 ### Challenges
 - SPI hardware configuration on Mango Pi, especially translating the D1-H manual to configuring and setting the correct registers in the proper order.
-    - Yifan Yang and Julie Zelinski's SPI module came in at the right time and allowed us to move forward with the sensors!
+    - Yifan Yang and Julie Zelenski's SPI module came in at the right time and allowed us to move forward with the sensors!
 - Assembling anemometer and drilling holes into 3D printed PLA materials to allow hall sensor to consistently detect magnet.
     - Matt Vaska provided the tools and guidance to allow us to successfully drill the holes after a few failed attempts!
 - Integrating external power supply for solenoid valve with lower voltages from Mango Pi
