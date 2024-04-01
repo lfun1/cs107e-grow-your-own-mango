@@ -3,6 +3,8 @@
 ## Project: “Grow Your Own Mango” — Weather Station and Drip Irrigation System
 **By Lisa Fung and Elias Chikwanda**
 
+![setup2](https://github.com/lfun1/cs107e-grow-your-own-mango/assets/71937811/18875f38-9b56-4cb1-bfae-2dcb6497efc2)
+
 ## Project Overview
 For our CS107E final project, we wanted to interact with the real world and build a practical tool that can help gardeners. We built a weather station that can sense temperature, humidity, pressure, and wind speed using the BME280 sensor and an anemometer. We also designed and built a drip irrigation system that tracks soil moisture using a soil moisture sensor and waters plants using a solenoid valve depending on the soil moisture level. Finally, we integrated all the sensor data and displayed it on a dashboard with graphs and data values.
 
